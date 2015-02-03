@@ -1,0 +1,13 @@
+## VS
+
+*/obj/*
+*/bin/*
+
+*.suo
+
+*.sln.DotSettings.user
+*.csproj.user
+
+deploy.sh
+
+packages
