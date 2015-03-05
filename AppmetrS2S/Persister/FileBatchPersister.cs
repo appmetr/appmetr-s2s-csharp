@@ -80,9 +80,9 @@
         {
             _lock.AcquireWriterLock(-1);
 
+            string batchFilePath = Path.Combine(_filePath, GetBatchFileName(_lastBatchId));
             try
             {
-                string batchFilePath = Path.Combine(_filePath, GetBatchFileName(_lastBatchId));
                 using (var fileStream = new FileStream(batchFilePath, FileMode.CreateNew))
                 using (var deflateStream = new DeflateStream(fileStream, CompressionLevel.Optimal))
                 {
@@ -101,6 +101,11 @@
                 if (Log.IsErrorEnabled)
                 {
                     Log.Error("Error in batch persist", e);
+                }
+
+                if (File.Exists(batchFilePath))
+                {
+                    File.Delete(batchFilePath);
                 }
             }
             finally
