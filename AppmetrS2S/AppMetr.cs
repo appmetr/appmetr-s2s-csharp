@@ -117,6 +117,7 @@
                 {
                     copyActions = new List<AppMetrAction>(_actionList);
                     _actionList.Clear();
+                    _eventSize = 0;
                 }
 
                 if (copyActions.Count > 0)
