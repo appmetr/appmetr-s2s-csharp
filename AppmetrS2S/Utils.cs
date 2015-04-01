@@ -84,8 +84,14 @@
                 var result = new Dictionary<string, object>() {{TypeFieldName, objType.AssemblyQualifiedName}};
 
                 ProcessFieldsAndProperties(obj,
-                    (attribute, info) => result.Add(attribute.Name, info.GetValue(obj)),
-                    (attribute, info) => result.Add(attribute.Name, info.GetValue(obj)));
+                    (attribute, info) =>
+                    {
+                        if (info.GetValue(obj) != null) result.Add(attribute.Name, info.GetValue(obj));
+                    },
+                    (attribute, info) => 
+                    {
+                        if (info.GetValue(obj) != null) result.Add(attribute.Name, info.GetValue(obj));
+                    });
 
                 return result;
             }
