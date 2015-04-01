@@ -67,6 +67,13 @@
                         Log.ErrorFormat("Error while reading batch for id {0}", batchId);
                     }
                 }
+                else
+                {
+                    if (Log.IsErrorEnabled)
+                    {
+                        Log.ErrorFormat("Batch file doesn't exist {0}", batchFilePath);    
+                    }
+                }
 
                 return null;
             }
