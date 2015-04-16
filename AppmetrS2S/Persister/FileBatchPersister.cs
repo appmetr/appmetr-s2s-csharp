@@ -45,7 +45,11 @@
             _lock.AcquireReaderLock(-1);
             try
             {
-                if (_fileIds.Count == 0) return null;
+                if (_fileIds.Count == 0)
+                {
+                    Log.Debug("FileIds list is empty, no Batch to process.");
+                    return null;
+                }
 
                 int batchId = _fileIds.Peek();
                 string batchFilePath = Path.Combine(_filePath, GetBatchFileName(batchId));
@@ -95,7 +99,7 @@
                 {
                     if (Log.IsDebugEnabled)
                     {
-                        Log.DebugFormat("Persis batch {0}", _lastBatchId);
+                        Log.DebugFormat("Persist batch {0}", _lastBatchId);
                     }
                     Utils.WriteBatch(deflateStream, new Batch(_lastBatchId, actions));
                     _fileIds.Enqueue(_lastBatchId);
