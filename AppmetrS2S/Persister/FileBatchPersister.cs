@@ -42,7 +42,9 @@
 
         public Batch GetNext()
         {
+            Log.Debug("Try to get reader lock");
             _lock.AcquireReaderLock(-1);
+            Log.Debug("Lock got successfully");
             try
             {
                 if (_fileIds.Count == 0)
@@ -54,6 +56,7 @@
                 int batchId = _fileIds.Peek();
                 string batchFilePath = Path.Combine(_filePath, GetBatchFileName(batchId));
 
+                Log.Debug(String.Format("Try to get file {0}", batchFilePath));
                 if (File.Exists(batchFilePath))
                 {
                     using (var fileStream = new FileStream(batchFilePath, FileMode.Open))
