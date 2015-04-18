@@ -78,10 +78,18 @@
                 {
                     if (Log.IsErrorEnabled)
                     {
-                        Log.ErrorFormat("Batch file doesn't exist {0}", batchFilePath);    
+                        Log.ErrorFormat("Batch file doesn't exist {0}", batchFilePath);
                     }
                 }
 
+                return null;
+            }
+            catch (Exception e)
+            {
+                if (Log.IsErrorEnabled)
+                {
+                    Log.Error("Exception while get next batch", e);
+                }
                 return null;
             }
             finally
