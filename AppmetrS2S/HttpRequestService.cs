@@ -40,18 +40,19 @@
 
             try
             {
-                var response = (HttpWebResponse) request.GetResponse();
-
-                var serializer = new DataContractJsonSerializer(typeof (JsonResponseWrapper));
-                var jsonResponse = (JsonResponseWrapper) serializer.ReadObject(response.GetResponseStream());
-
-                if (jsonResponse.Error != null)
+                using (var response = (HttpWebResponse) request.GetResponse())
                 {
-                    Log.ErrorFormat("Server return error with message: {0}", jsonResponse.Error.Message);
-                }
-                else if (jsonResponse.Response != null && "OK".Equals(jsonResponse.Response.Status))
-                {
-                    return true;
+                    var serializer = new DataContractJsonSerializer(typeof (JsonResponseWrapper));
+                    var jsonResponse = (JsonResponseWrapper) serializer.ReadObject(response.GetResponseStream());
+
+                    if (jsonResponse.Error != null)
+                    {
+                        Log.ErrorFormat("Server return error with message: {0}", jsonResponse.Error.Message);
+                    }
+                    else if (jsonResponse.Response != null && "OK".Equals(jsonResponse.Response.Status))
+                    {
+                        return true;
+                    }
                 }
             }
             catch (Exception e)

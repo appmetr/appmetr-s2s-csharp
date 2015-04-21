@@ -148,8 +148,11 @@
                 {
                     allBatchCounter++;
 
+                    Log.DebugFormat("Starting send batch with id={0}", batch.GetBatchId());
                     if (HttpRequestService.SendRequest(_url, _token, batch))
                     {
+                        Log.DebugFormat("Successfuly send batch with id={0}", batch.GetBatchId());
+
                         _batchPersister.Remove();
                         uploadedBatchCounter++;
 

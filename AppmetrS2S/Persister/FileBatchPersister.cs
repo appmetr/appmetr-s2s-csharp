@@ -59,15 +59,20 @@
                 Log.Debug(String.Format("Try to get file {0}", batchFilePath));
                 if (File.Exists(batchFilePath))
                 {
+                    Log.DebugFormat("File {0} exists!", batchFilePath);
+
                     using (var fileStream = new FileStream(batchFilePath, FileMode.Open))
                     using (var deflateStream = new DeflateStream(fileStream, CompressionMode.Decompress))
                     {
+                        Log.DebugFormat("Deflated file stream created for file {0}", batchFilePath);
                         Batch batch;
                         if (Utils.TryReadBatch(deflateStream, out batch))
                         {
+                            Log.DebugFormat("Successfully read the batch from file {0}", batchFilePath);
                             return batch;
                         }
                     }
+                    Log.DebugFormat("Cant read batch from file {0}", batchFilePath);
 
                     if (Log.IsErrorEnabled)
                     {
