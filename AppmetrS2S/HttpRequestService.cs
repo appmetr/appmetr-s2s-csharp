@@ -32,16 +32,21 @@
             request.Method = "POST";
             request.ContentType = "application/octet-stream";
 
+            Log.DebugFormat("Getting request stream for batch with id={0}", batch.GetBatchId());
             using (var stream = request.GetRequestStream())
             using (var deflateStream = new DeflateStream(stream, CompressionLevel.Optimal))
             {
+                Log.DebugFormat("Request and deflated streams created for batch with id={0}", batch.GetBatchId());
                 Utils.WriteBatch(deflateStream, batch);
             }
 
             try
             {
+                Log.DebugFormat("Getting response after sending batch with id={0}", batch.GetBatchId());
                 using (var response = (HttpWebResponse) request.GetResponse())
                 {
+                    Log.DebugFormat("Response received for batch with id={0}", batch.GetBatchId());
+
                     var serializer = new DataContractJsonSerializer(typeof (JsonResponseWrapper));
                     var jsonResponse = (JsonResponseWrapper) serializer.ReadObject(response.GetResponseStream());
 

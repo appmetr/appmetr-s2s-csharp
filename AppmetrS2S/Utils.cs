@@ -36,10 +36,15 @@
 
         public static void WriteBatch(Stream stream, Batch batch)
         {
+            Log.DebugFormat("Starting serialize batch with id={0}", batch.GetBatchId());
             var json = serializer.Serialize(batch);
+            Log.DebugFormat("Get bytes from serialized batch with id={0}", batch.GetBatchId());
             byte[] data = Encoding.UTF8.GetBytes(json);
+            Log.DebugFormat("Write bytes to stream. Batch id={0}", batch.GetBatchId());
             stream.Write(data, 0, data.Length);
-        }
+            Log.DebugFormat("Flush stream. Batch id={0}", batch.GetBatchId());
+            stream.Flush();
+        }   
 
         public static bool TryReadBatch(Stream stream, out Batch batch)
         {
