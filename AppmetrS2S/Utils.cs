@@ -1,4 +1,6 @@
-﻿namespace AppmetrS2S
+﻿using System.Net.Mail;
+
+namespace AppmetrS2S
 {
     #region using directives
 
@@ -34,6 +36,19 @@
             return (long) (DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalMilliseconds;
         }
 
+        public static byte[] SerializeBatch(Batch batch)
+        {
+            var json = serializer.Serialize(batch);
+            byte[] data = Encoding.UTF8.GetBytes(json);
+            return data;
+        }
+
+        public static void WriteData(Stream stream, byte[] data)
+        {
+            stream.Write(data, 0, data.Length);
+            stream.Flush();
+        }
+
         public static void WriteBatch(Stream stream, Batch batch)
         {
             Log.DebugFormat("Starting serialize batch with id={0}", batch.GetBatchId());
@@ -44,7 +59,7 @@
             stream.Write(data, 0, data.Length);
             Log.DebugFormat("Flush stream. Batch id={0}", batch.GetBatchId());
             stream.Flush();
-        }   
+        }
 
         public static bool TryReadBatch(Stream stream, out Batch batch)
         {

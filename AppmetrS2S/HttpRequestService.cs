@@ -28,16 +28,20 @@
             @params.Add("token", token);
             @params.Add("timestamp", Convert.ToString(Utils.GetNowUnixTimestamp()));
 
+            var serializedBatch = Utils.SerializeBatch(batch);
+
             var request = (HttpWebRequest) WebRequest.Create(httpURL + "?" + MakeQueryString(@params));
             request.Method = "POST";
             request.ContentType = "application/octet-stream";
+            request.ContentLength = serializedBatch.Length;
 
             Log.DebugFormat("Getting request stream for batch with id={0}", batch.GetBatchId());
             using (var stream = request.GetRequestStream())
             using (var deflateStream = new DeflateStream(stream, CompressionLevel.Optimal))
             {
                 Log.DebugFormat("Request and deflated streams created for batch with id={0}", batch.GetBatchId());
-                Utils.WriteBatch(deflateStream, batch);
+                Log.DebugFormat("Write bytes to stream. Batch id={0}", batch.GetBatchId());
+                Utils.WriteData(deflateStream, serializedBatch);
             }
 
             try
@@ -63,6 +67,7 @@
             catch (Exception e)
             {
                 Log.Error("Send error", e);
+                request.Abort();
             }
 
             return false;
