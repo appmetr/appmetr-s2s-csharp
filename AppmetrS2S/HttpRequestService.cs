@@ -1,4 +1,6 @@
-﻿namespace AppmetrS2S
+﻿using System.IO;
+
+namespace AppmetrS2S
 {
     #region using directives
 
@@ -28,20 +30,29 @@
             @params.Add("token", token);
             @params.Add("timestamp", Convert.ToString(Utils.GetNowUnixTimestamp()));
 
+            byte[] deflatedBatch;
             var serializedBatch = Utils.SerializeBatch(batch);
+            using (var memoryStream = new MemoryStream())
+            {
+                using (var deflateStream = new DeflateStream(memoryStream, CompressionLevel.Optimal))
+                {
+                    Utils.WriteData(deflateStream, serializedBatch);
+                }
 
-            var request = (HttpWebRequest) WebRequest.Create(httpURL + "?" + MakeQueryString(@params));
+                deflatedBatch = memoryStream.ToArray();
+            }
+            
+            var request = (HttpWebRequest)WebRequest.Create(httpURL + "?" + MakeQueryString(@params));
             request.Method = "POST";
             request.ContentType = "application/octet-stream";
-            request.ContentLength = serializedBatch.Length;
+            request.ContentLength = deflatedBatch.Length;
 
-            Log.DebugFormat("Getting request stream for batch with id={0}", batch.GetBatchId());
+            Log.DebugFormat("Getting request (contentLength = {0}) stream for batch with id={1}", deflatedBatch.Length, batch.GetBatchId());
             using (var stream = request.GetRequestStream())
-            using (var deflateStream = new DeflateStream(stream, CompressionLevel.Optimal))
             {
-                Log.DebugFormat("Request and deflated streams created for batch with id={0}", batch.GetBatchId());
+                Log.DebugFormat("Request stream created for batch with id={0}", batch.GetBatchId());
                 Log.DebugFormat("Write bytes to stream. Batch id={0}", batch.GetBatchId());
-                Utils.WriteData(deflateStream, serializedBatch);
+                Utils.WriteData(stream, deflatedBatch);
             }
 
             try
