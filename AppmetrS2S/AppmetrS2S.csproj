@@ -57,11 +57,14 @@
     <Compile Include="AppMetr.cs" />
     <Compile Include="AppMetrTimer.cs" />
     <Compile Include="HttpRequestService.cs" />
+    <Compile Include="Serializations\IJsonSerializer.cs" />
     <Compile Include="Persister\Batch.cs" />
     <Compile Include="Persister\FileBatchPersister.cs" />
     <Compile Include="Persister\IBatchPersister.cs" />
     <Compile Include="Persister\MemoryBatchPersister.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Serializations\JavaScriptJsonSerializerWithCache.cs" />
+    <Compile Include="Serializations\JavaScriptJsonSerializer.cs" />
     <Compile Include="Utils.cs" />
   </ItemGroup>
   <ItemGroup>
