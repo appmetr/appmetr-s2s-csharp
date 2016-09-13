@@ -21,6 +21,9 @@ namespace AppmetrS2S
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof (HttpRequestService));
 
+		private static readonly int READ_WRITE_TIMEOUT = 60 * 1000;
+		private static readonly int WHOLE_RQUEST_TIMEOUT = 120 * 1000;
+
         private const String ServerMethodName = "server.trackS2S";
 
         public static bool SendRequest(String httpURL, String token, Batch batch)
@@ -46,6 +49,8 @@ namespace AppmetrS2S
             request.Method = "POST";
             request.ContentType = "application/octet-stream";
             request.ContentLength = deflatedBatch.Length;
+			request.Timeout = WHOLE_RQUEST_TIMEOUT;
+			request.ReadWriteTimeout = READ_WRITE_TIMEOUT;
 
             Log.DebugFormat("Getting request (contentLength = {0}) stream for batch with id={1}", deflatedBatch.Length, batch.GetBatchId());
             using (var stream = request.GetRequestStream())
