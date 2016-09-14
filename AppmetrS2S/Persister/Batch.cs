@@ -13,6 +13,7 @@
     [KnownType(typeof(Event))]
     [KnownType(typeof(Level))]
     [KnownType(typeof(Payment))]
+    [KnownType(typeof(AttachProperties))]
     public class Batch
     {
         [DataMember(Name = "batchId")]
