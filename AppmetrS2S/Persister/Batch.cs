@@ -10,6 +10,7 @@
     #endregion
 
     [DataContract]
+    [KnownType(typeof(AttachProperties))]
     [KnownType(typeof(Event))]
     [KnownType(typeof(Level))]
     [KnownType(typeof(Payment))]
