@@ -55,6 +55,7 @@
     <Compile Include="Actions\Event.cs" />
     <Compile Include="Actions\Level.cs" />
     <Compile Include="Actions\Payment.cs" />
+    <Compile Include="Actions\TrackSession.cs" />
     <Compile Include="AppMetr.cs" />
     <Compile Include="AppMetrTimer.cs" />
     <Compile Include="HttpRequestService.cs" />
