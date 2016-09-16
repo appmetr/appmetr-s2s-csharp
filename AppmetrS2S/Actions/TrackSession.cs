@@ -10,7 +10,7 @@ namespace AppmetrS2S.Actions
     [DataContract]
     public class TrackSession : AppMetrAction
     {
-        private const String ACTION = "server.trackSession";
+        private const String ACTION = "trackSession";
 
         public TrackSession() : base(ACTION)
         {
