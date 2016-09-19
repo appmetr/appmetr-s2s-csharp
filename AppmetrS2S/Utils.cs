@@ -1,4 +1,4 @@
-﻿using System.Net.Mail;
+using System.Net.Mail;
 
 namespace AppmetrS2S
 {
@@ -16,6 +16,7 @@ namespace AppmetrS2S
     using log4net;
     using log4net.Repository.Hierarchy;
     using Persister;
+	using log4net;
 
     #endregion
 
@@ -24,6 +25,7 @@ namespace AppmetrS2S
         private static readonly ILog Log = LogManager.GetLogger(typeof(FileBatchPersister));
 
         private static JavaScriptSerializer serializer;
+        private static readonly ILog Log = LogManager.GetLogger(typeof(Utils));
 
         static Utils()
         {
@@ -70,11 +72,15 @@ namespace AppmetrS2S
             }
             catch (Exception e)
             {
+<<<<<<< HEAD
                 if (Log.IsErrorEnabled)
                 {
                     Log.Error("Error while deserialization batch", e);    
                 }
                 
+=======
+                Log.Error("Error deserializing batch", e);
+>>>>>>> 5cb464b3c8bd888746bce2e13ed730af203fa4da
                 batch = null;
                 return false;
             }
