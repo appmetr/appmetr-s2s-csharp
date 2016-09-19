@@ -12,12 +12,14 @@
     using System.Web.Script.Serialization;
     using Actions;
     using Persister;
+	using log4net;
 
     #endregion
 
     internal class Utils
     {
         private static JavaScriptSerializer serializer;
+        private static readonly ILog Log = LogManager.GetLogger(typeof(Utils));
 
         static Utils()
         {
@@ -44,8 +46,9 @@
                 batch = serializer.Deserialize<Batch>(new StreamReader(stream).ReadToEnd());
                 return true;
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                Log.Error("Error deserializing batch", e);
                 batch = null;
                 return false;
             }

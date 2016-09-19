@@ -141,12 +141,18 @@
                 files.Select(file => Convert.ToInt32(Path.GetFileName(file).Substring(BatchFilePrefix.Length))).ToList();
             ids.Sort();
 
-            String batchId;
+            String batchId = null;
             if (File.Exists(_batchIdFile) && (batchId = File.ReadAllText(_batchIdFile)).Length > 0)
             {
-                _lastBatchId = Convert.ToInt32(batchId);
+				try {
+                	_lastBatchId = Convert.ToInt32(batchId);
+				}catch(Exception e){
+					Log.Error("Error loading reading last batch id. Counting files",e);
+					batchId = null;
+				}
             }
-            else if (ids.Count > 0)
+            
+			if (batchId == null && ids.Count > 0)
             {
                 _lastBatchId = ids[ids.Count - 1];
             }
