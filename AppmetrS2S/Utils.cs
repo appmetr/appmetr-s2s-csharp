@@ -21,7 +21,7 @@ namespace AppmetrS2S
 
     internal class Utils
     {
-        private static ILog Log = LogUtils.GetLogger(typeof(FileBatchPersister));
+        private static readonly ILog Log = LogUtils.GetLogger(typeof(FileBatchPersister));
 
         private static JavaScriptSerializer serializer;
 
