@@ -59,6 +59,7 @@
     <Compile Include="AppMetr.cs" />
     <Compile Include="AppMetrTimer.cs" />
     <Compile Include="HttpRequestService.cs" />
+    <Compile Include="LogUtils.cs" />
     <Compile Include="Persister\Batch.cs" />
     <Compile Include="Persister\FileBatchPersister.cs" />
     <Compile Include="Persister\IBatchPersister.cs" />

@@ -13,7 +13,7 @@
 
     public class AppMetr
     {
-        private static readonly ILog _log = LogManager.GetLogger(typeof (AppMetr));
+        private static readonly ILog _log = LogUtils.GetLogger(typeof (AppMetr));
 
         private readonly string _token;
         private readonly string _url;

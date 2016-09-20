@@ -15,7 +15,7 @@
 
     public class FileBatchPersister : IBatchPersister
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(FileBatchPersister));
+        private static readonly ILog Log = LogUtils.GetLogger(typeof(FileBatchPersister));
 
         private readonly ReaderWriterLock _lock = new ReaderWriterLock();
 

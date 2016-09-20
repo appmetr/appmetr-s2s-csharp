@@ -19,10 +19,10 @@ namespace AppmetrS2S
 
     internal class HttpRequestService
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof (HttpRequestService));
+        private static readonly ILog Log = LogUtils.GetLogger(typeof (HttpRequestService));
 
-		private static readonly int READ_WRITE_TIMEOUT = 60 * 1000;
-		private static readonly int WHOLE_RQUEST_TIMEOUT = 120 * 1000;
+		private static readonly int READ_WRITE_TIMEOUT = 10 * 60 * 1000;
+		private static readonly int WHOLE_RQUEST_TIMEOUT = 12 * 60 * 1000;
 
         private const String ServerMethodName = "server.trackS2S";
 
