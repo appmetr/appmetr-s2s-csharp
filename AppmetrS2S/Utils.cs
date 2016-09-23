@@ -23,9 +23,7 @@ namespace AppmetrS2S
     internal class Utils
     {
         private static readonly ILog Log = LogUtils.GetLogger(typeof(FileBatchPersister));
-
         private static JavaScriptSerializer serializer;
-        private static readonly ILog Log = LogManager.GetLogger(typeof(Utils));
 
         static Utils()
         {
@@ -73,15 +71,10 @@ namespace AppmetrS2S
             }
             catch (Exception e)
             {
-<<<<<<< HEAD
                 if (Log.IsErrorEnabled)
                 {
                     Log.Error("Error while deserialization batch", e);    
                 }
-                
-=======
-                Log.Error("Error deserializing batch", e);
->>>>>>> 5cb464b3c8bd888746bce2e13ed730af203fa4da
                 batch = null;
                 return false;
             }
