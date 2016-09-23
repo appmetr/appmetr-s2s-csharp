@@ -22,7 +22,7 @@ namespace AppmetrS2S
 
     internal class Utils
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(FileBatchPersister));
+        private static readonly ILog Log = LogUtils.GetLogger(typeof(FileBatchPersister));
 
         private static JavaScriptSerializer serializer;
         private static readonly ILog Log = LogManager.GetLogger(typeof(Utils));
@@ -68,6 +68,7 @@ namespace AppmetrS2S
             try
             {
                 batch = serializer.Deserialize<Batch>(new StreamReader(stream).ReadToEnd());
+                Log.InfoFormat("Successfully read the batch {0}", batch.GetBatchId());
                 return true;
             }
             catch (Exception e)
@@ -134,6 +135,10 @@ namespace AppmetrS2S
 
                 ConstructorInfo constructor = objType.GetConstructor(BindingFlags.Instance | BindingFlags.NonPublic,
                     null, new Type[0], null);
+                if (constructor == null)
+                    constructor = objType.GetConstructor(BindingFlags.Instance | BindingFlags.Public,
+                        null, new Type[0], null);
+
                 var result = constructor.Invoke(null);
 
                 Action<DataMemberAttribute, MemberInfo> action = (attribute, info) =>

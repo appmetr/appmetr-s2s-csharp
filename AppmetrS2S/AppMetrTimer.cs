@@ -10,7 +10,7 @@
 
     public class AppMetrTimer
     {
-        private static readonly ILog _log = LogManager.GetLogger(typeof (AppMetrTimer));
+        private static readonly ILog _log = LogUtils.GetLogger(typeof (AppMetrTimer));
 
         private readonly int _period;
         private readonly Action _onTimer;
