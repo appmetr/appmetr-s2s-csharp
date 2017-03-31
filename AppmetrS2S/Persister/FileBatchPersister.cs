@@ -23,9 +23,10 @@
 
         private readonly String _filePath;
         private readonly String _batchIdFile;
-
+ 
         private Queue<int> _fileIds;
         private int _lastBatchId;
+        private String _serverId;
 
         public FileBatchPersister(String filePath)
         {
@@ -117,7 +118,7 @@
                     {
                         Log.DebugFormat("Persist batch {0}", _lastBatchId);
                     }
-                    Utils.WriteBatch(deflateStream, new Batch(_lastBatchId, actions));
+                    Utils.WriteBatch(deflateStream, new Batch(_serverId, _lastBatchId, actions));
                     _fileIds.Enqueue(_lastBatchId);
 
                     UpdateLastBatchId();
@@ -211,6 +212,11 @@
         private String GetBatchFileName(int batchId)
         {
             return String.Format("{0}{1:D11}", BatchFilePrefix, batchId);
+        }
+
+        public void SetServerId(string serverId)
+        {
+            _serverId = serverId;
         }
     }
 }

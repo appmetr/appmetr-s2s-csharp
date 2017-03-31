@@ -43,6 +43,8 @@
             _url = url;
             _batchPersister = batchPersister ?? new MemoryBatchPersister();
 
+            _batchPersister.SetServerId(Guid.NewGuid().ToString());
+
             _flushTimer = new AppMetrTimer(FlushPeriod, Flush, "FlushJob");
             new Thread(_flushTimer.Start).Start();
 

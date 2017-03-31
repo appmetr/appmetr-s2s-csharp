@@ -2,6 +2,7 @@
 {
     using System.Collections.Generic;
     using Actions;
+    using System;
 
     public interface IBatchPersister
     {
@@ -19,6 +20,12 @@
         /// <summary>
         /// Remove oldest batch from storage.
         /// </summary>
-        void Remove(); 
+        void Remove();
+
+        /// <summary>
+        /// Setup server Id for batch identification
+        /// </summary>
+        /// <param name="serverId">server id to identify batches</param>
+        void SetServerId(String serverId);
     }
 }
