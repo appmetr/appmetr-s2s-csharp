@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using AppmetrS2S.Serializations;
 
 namespace AppmetrS2S
 {
@@ -24,28 +25,39 @@ namespace AppmetrS2S
 		private static readonly int READ_WRITE_TIMEOUT = 10 * 60 * 1000;
 		private static readonly int WHOLE_RQUEST_TIMEOUT = 12 * 60 * 1000;
 
-        private const String ServerMethodName = "server.trackS2S";
+        private const string ServerMethodName = "server.trackS2S";
+        private readonly IJsonSerializer _serializer;
 
-        public static bool SendRequest(String httpURL, String token, Batch batch)
+        public HttpRequestService() : this(new JavaScriptJsonSerializer())
         {
-            var @params = new Dictionary<String, String>(2);
-            @params.Add("method", ServerMethodName);
-            @params.Add("token", token);
-            @params.Add("timestamp", Convert.ToString(Utils.GetNowUnixTimestamp()));
+        }
+
+        public HttpRequestService(IJsonSerializer serializer)
+        {
+            _serializer = serializer;
+        }
+
+        public bool SendRequest(string httpUrl, string token, Batch batch)
+        {
+            var @params = new Dictionary<string, string>(3)
+            {
+                {"method", ServerMethodName},
+                {"token", token},
+                {"timestamp", Convert.ToString(Utils.GetNowUnixTimestamp())}
+            };
 
             byte[] deflatedBatch;
-            var serializedBatch = Utils.SerializeBatch(batch);
+            var serializedBatch = Utils.SerializeBatch(batch, _serializer);
             using (var memoryStream = new MemoryStream())
             {
                 using (var deflateStream = new DeflateStream(memoryStream, CompressionLevel.Optimal))
                 {
                     Utils.WriteData(deflateStream, serializedBatch);
                 }
-
                 deflatedBatch = memoryStream.ToArray();
             }
             
-            var request = (HttpWebRequest)WebRequest.Create(httpURL + "?" + MakeQueryString(@params));
+            var request = (HttpWebRequest)WebRequest.Create(httpUrl + "?" + MakeQueryString(@params));
             request.Method = "POST";
             request.ContentType = "application/octet-stream";
             request.ContentLength = deflatedBatch.Length;

@@ -1,4 +1,6 @@
-﻿namespace AppmetrS2S.Persister
+﻿using AppmetrS2S.Serializations;
+
+namespace AppmetrS2S.Persister
 {
     #region using directives
 
@@ -19,16 +21,21 @@
 
         private readonly ReaderWriterLock _lock = new ReaderWriterLock();
 
-        private const String BatchFilePrefix = "batchFile#";
+        private const string BatchFilePrefix = "batchFile#";
 
-        private readonly String _filePath;
-        private readonly String _batchIdFile;
- 
+        private readonly string _filePath;
+        private readonly string _batchIdFile;
+        private readonly IJsonSerializer _serializer;
+
         private Queue<int> _fileIds;
         private int _lastBatchId;
         private String _serverId;
 
-        public FileBatchPersister(String filePath)
+        public FileBatchPersister(string filePath) : this(filePath, new JavaScriptJsonSerializer())
+        {
+        }
+
+        public FileBatchPersister(string filePath, IJsonSerializer serializer)
         {
             if (!Directory.Exists(filePath))
             {
@@ -37,6 +44,7 @@
 
             _filePath = filePath;
             _batchIdFile = Path.Combine(Path.GetFullPath(_filePath), "lastBatchId");
+            _serializer = serializer;
 
             InitPersistedFiles();
         }
@@ -67,7 +75,7 @@
                     {
                         Log.DebugFormat("Deflated file stream created for file {0}", batchFilePath);
                         Batch batch;
-                        if (Utils.TryReadBatch(deflateStream, out batch))
+                        if (Utils.TryReadBatch(deflateStream, _serializer, out batch))
                         {
                             Log.DebugFormat("Successfully read the batch from file {0}", batchFilePath);
                             return batch;
@@ -118,7 +126,7 @@
                     {
                         Log.DebugFormat("Persist batch {0}", _lastBatchId);
                     }
-                    Utils.WriteBatch(deflateStream, new Batch(_serverId, _lastBatchId, actions));
+                    Utils.WriteBatch(deflateStream, new Batch(_serverId, _lastBatchId, actions), _serializer);
                     _fileIds.Enqueue(_lastBatchId);
 
                     UpdateLastBatchId();
@@ -163,11 +171,12 @@
 
         private void InitPersistedFiles()
         {
-            String[] files = Directory.GetFiles(_filePath, String.Format("{0}*", BatchFilePrefix));
+            string[] files = Directory.GetFiles(_filePath, String.Format("{0}*", BatchFilePrefix));
 
-            var ids =
-                files.Select(file => Convert.ToInt32(Path.GetFileName(file).Substring(BatchFilePrefix.Length))).ToList();
-            ids.Sort();
+            var ids = files
+                .Select(file => Convert.ToInt32(Path.GetFileName(file).Substring(BatchFilePrefix.Length)))
+                .OrderBy(_ => _)
+                .ToList();
 
             String batchId = null;
             if (File.Exists(_batchIdFile) && (batchId = File.ReadAllText(_batchIdFile)).Length > 0)
@@ -179,7 +188,7 @@
 					batchId = null;
 				}
             }
-            
+
 			if (batchId == null && ids.Count > 0)
             {
                 _lastBatchId = ids[ids.Count - 1];

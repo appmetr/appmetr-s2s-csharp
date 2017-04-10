@@ -1,4 +1,6 @@
-﻿namespace AppmetrS2S
+﻿using AppmetrS2S.Serializations;
+
+namespace AppmetrS2S
 {
     #region using directives
 
@@ -18,6 +20,7 @@
         private readonly string _token;
         private readonly string _url;
         private readonly IBatchPersister _batchPersister;
+        private readonly HttpRequestService _httpRequestService;
 
         private bool _stopped;
         private readonly List<AppMetrAction> _actionList = new List<AppMetrAction>();
@@ -35,13 +38,18 @@
         private const int FlushPeriod = MillisPerMinute/2;
         private const int UploadPeriod = MillisPerMinute/2;
 
-        public AppMetr(String token, String url, IBatchPersister batchPersister = null)
+        public AppMetr(
+            string token,
+            string url,
+            IBatchPersister batchPersister = null,
+            IJsonSerializer serializer = null)
         {
             _log.InfoFormat("Start Appmetr for token={0}, url={1}", token, url);
 
             _token = token;
             _url = url;
             _batchPersister = batchPersister ?? new MemoryBatchPersister();
+            _httpRequestService = new HttpRequestService(serializer ?? new JavaScriptJsonSerializer());
 
             _batchPersister.SetServerId(Guid.NewGuid().ToString());
 
@@ -142,7 +150,7 @@
                     allBatchCounter++;
 
                     _log.DebugFormat("Starting send batch with id={0}", batch.GetBatchId());
-                    if (HttpRequestService.SendRequest(_url, _token, batch))
+                    if (_httpRequestService.SendRequest(_url, _token, batch))
                     {
                         _log.DebugFormat("Successfuly send batch with id={0}", batch.GetBatchId());
 
