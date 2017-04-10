@@ -1,4 +1,6 @@
-﻿namespace AppmetrS2S.Persister
+﻿using AppmetrS2S.Serializations;
+
+namespace AppmetrS2S.Persister
 {
     #region using directives
 
@@ -15,19 +17,24 @@
 
     public class FileBatchPersister : IBatchPersister
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(FileBatchPersister));
+        private static readonly ILog _log = LogManager.GetLogger(typeof(FileBatchPersister));
 
         private readonly ReaderWriterLock _lock = new ReaderWriterLock();
 
-        private const String BatchFilePrefix = "batchFile#";
+        private const string BatchFilePrefix = "batchFile#";
 
-        private readonly String _filePath;
-        private readonly String _batchIdFile;
+        private readonly string _filePath;
+        private readonly string _batchIdFile;
+        private readonly IJsonSerializer _serializer;
 
         private Queue<int> _fileIds;
         private int _lastBatchId;
 
-        public FileBatchPersister(String filePath)
+        public FileBatchPersister(string filePath) : this(filePath, new JavaScriptJsonSerializer())
+        {
+        }
+
+        public FileBatchPersister(string filePath, IJsonSerializer serializer)
         {
             if (!Directory.Exists(filePath))
             {
@@ -36,38 +43,66 @@
 
             _filePath = filePath;
             _batchIdFile = Path.Combine(Path.GetFullPath(_filePath), "lastBatchId");
+            _serializer = serializer;
 
             InitPersistedFiles();
         }
 
         public Batch GetNext()
         {
+            _log.Debug("Try to get reader lock");
             _lock.AcquireReaderLock(-1);
+            _log.Debug("Lock got successfully");
             try
             {
-                if (_fileIds.Count == 0) return null;
+                if (_fileIds.Count == 0)
+                {
+                    _log.Debug("FileIds list is empty, no Batch to process.");
+                    return null;
+                }
 
                 int batchId = _fileIds.Peek();
                 string batchFilePath = Path.Combine(_filePath, GetBatchFileName(batchId));
 
+                _log.Debug(String.Format("Try to get file {0}", batchFilePath));
                 if (File.Exists(batchFilePath))
                 {
+                    _log.DebugFormat("File {0} exists!", batchFilePath);
+
                     using (var fileStream = new FileStream(batchFilePath, FileMode.Open))
                     using (var deflateStream = new DeflateStream(fileStream, CompressionMode.Decompress))
                     {
+                        _log.DebugFormat("Deflated file stream created for file {0}", batchFilePath);
                         Batch batch;
-                        if (Utils.TryReadBatch(deflateStream, out batch))
+                        if (Utils.TryReadBatch(deflateStream, _serializer, out batch))
                         {
+                            _log.DebugFormat("Successfully read the batch from file {0}", batchFilePath);
                             return batch;
                         }
                     }
+                    _log.DebugFormat("Cant read batch from file {0}", batchFilePath);
 
-                    if (Log.IsErrorEnabled)
+                    if (_log.IsErrorEnabled)
                     {
-                        Log.ErrorFormat("Error while reading batch for id {0}", batchId);
+                        _log.ErrorFormat("Error while reading batch for id {0}", batchId);
+                    }
+                }
+                else
+                {
+                    if (_log.IsErrorEnabled)
+                    {
+                        _log.ErrorFormat("Batch file doesn't exist {0}", batchFilePath);
                     }
                 }
 
+                return null;
+            }
+            catch (Exception e)
+            {
+                if (_log.IsErrorEnabled)
+                {
+                    _log.Error("Exception while get next batch", e);
+                }
                 return null;
             }
             finally
@@ -86,11 +121,11 @@
                 using (var fileStream = new FileStream(batchFilePath, FileMode.CreateNew))
                 using (var deflateStream = new DeflateStream(fileStream, CompressionLevel.Optimal))
                 {
-                    if (Log.IsDebugEnabled)
+                    if (_log.IsDebugEnabled)
                     {
-                        Log.DebugFormat("Persis batch {0}", _lastBatchId);
+                        _log.DebugFormat("Persist batch {0}", _lastBatchId);
                     }
-                    Utils.WriteBatch(deflateStream, new Batch(_lastBatchId, actions));
+                    Utils.WriteBatch(deflateStream, new Batch(_lastBatchId, actions), _serializer);
                     _fileIds.Enqueue(_lastBatchId);
 
                     UpdateLastBatchId();
@@ -98,9 +133,9 @@
             }
             catch (Exception e)
             {
-                if (Log.IsErrorEnabled)
+                if (_log.IsErrorEnabled)
                 {
-                    Log.Error("Error in batch persist", e);
+                    _log.Error("Error in batch persist", e);
                 }
 
                 if (File.Exists(batchFilePath))
@@ -120,9 +155,9 @@
 
             try
             {
-                if (Log.IsDebugEnabled)
+                if (_log.IsDebugEnabled)
                 {
-                    Log.DebugFormat("Remove file with index {0}", _fileIds.Peek());
+                    _log.DebugFormat("Remove file with index {0}", _fileIds.Peek());
                 }
 
                 File.Delete(Path.Combine(_filePath, GetBatchFileName(_fileIds.Dequeue())));
@@ -155,14 +190,14 @@
                 _lastBatchId = 0;
             }
 
-            Log.InfoFormat("Init lastBatchId with {0}", _lastBatchId);
+            _log.InfoFormat("Init lastBatchId with {0}", _lastBatchId);
 
-            if (Log.IsInfoEnabled)
+            if (_log.IsInfoEnabled)
             {
-                Log.InfoFormat("Load {0} files from disk", ids.Count);
+                _log.InfoFormat("Load {0} files from disk", ids.Count);
                 if (ids.Count > 0)
                 {
-                    Log.InfoFormat("First batch id is {0}, last is {1}", ids[0], ids[ids.Count - 1]);
+                    _log.InfoFormat("First batch id is {0}, last is {1}", ids[0], ids[ids.Count - 1]);
                 }
             }
 
