@@ -23,13 +23,17 @@
         [DataMember(Name = "batch")]
         private readonly List<AppMetrAction> _batch;
 
+        [DataMember(Name = "serverId")]
+        private readonly String _serverId;
+
         private Batch()
         {
             
         }
 
-        public Batch(int batchId, IEnumerable<AppMetrAction> actionList)
+        public Batch(String serverId, int batchId, IEnumerable<AppMetrAction> actionList)
         {
+            _serverId = serverId;
             _batchId = batchId;
             _batch = new List<AppMetrAction>(actionList);
         }
@@ -46,7 +50,7 @@
 
         public override string ToString()
         {
-            return String.Format("Batch{{events={0}, batchId={1}}}", _batch.Count, _batchId);
+            return String.Format("Batch{{events={0}, batchId={1}, serverId={2}}", _batch.Count, _batchId, _serverId);
         }
     }
 }

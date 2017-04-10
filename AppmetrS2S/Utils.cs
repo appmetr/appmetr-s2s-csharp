@@ -14,9 +14,7 @@ namespace AppmetrS2S
     using System.Web.Script.Serialization;
     using Actions;
     using log4net;
-    using log4net.Repository.Hierarchy;
-    using Persister;
-	using log4net;
+     using Persister;
 
     #endregion
 
