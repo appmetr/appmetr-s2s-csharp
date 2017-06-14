@@ -27,8 +27,8 @@ namespace AppmetrS2S.Persister
         private readonly string _batchIdFile;
         private readonly IJsonSerializer _serializer;
 
-        private Queue<int> _fileIds;
-        private int _lastBatchId;
+        private Queue<Int64> _fileIds;
+        private Int64 _lastBatchId;
         private String _serverId;
 
         public FileBatchPersister(string filePath) : this(filePath, new JavaScriptJsonSerializer())
@@ -62,8 +62,8 @@ namespace AppmetrS2S.Persister
                     return null;
                 }
 
-                int batchId = _fileIds.Peek();
-                string batchFilePath = Path.Combine(_filePath, GetBatchFileName(batchId));
+                var batchId = _fileIds.Peek();
+                var batchFilePath = Path.Combine(_filePath, GetBatchFileName(batchId));
 
                 Log.Debug(String.Format("Try to get file {0}", batchFilePath));
                 if (File.Exists(batchFilePath))
@@ -174,25 +174,25 @@ namespace AppmetrS2S.Persister
             string[] files = Directory.GetFiles(_filePath, String.Format("{0}*", BatchFilePrefix));
 
             var ids = files
-                .Select(file => Convert.ToInt32(Path.GetFileName(file).Substring(BatchFilePrefix.Length)))
+                .Select(file => Convert.ToInt64(Path.GetFileName(file).Substring(BatchFilePrefix.Length)))
                 .OrderBy(_ => _)
                 .ToList();
 
-            var batchId = Int32.MinValue;
+            var batchId = Int64.MinValue;
             try
             {
                 string batchStr;
                 if (File.Exists(_batchIdFile) && (batchStr = File.ReadAllText(_batchIdFile)).Length > 0)
                 {
-                    batchId = Convert.ToInt32(batchStr);
+                    batchId = Convert.ToInt64(batchStr);
                 }
             } catch (Exception e) {
                 Log.Error("Error loading reading last batch id. Counting files", e);
             }
 
-            if (batchId == Int32.MinValue)
+            if (batchId == Int64.MinValue)
             {
-                _lastBatchId = ids.Count > 0 ? ids[ids.Count - 1] : 0;
+                _lastBatchId = ids.Count > 0 ? ids[ids.Count - 1] : 0L;
             }
             else
             {
@@ -210,7 +210,7 @@ namespace AppmetrS2S.Persister
                 }
             }
 
-            _fileIds = new Queue<int>(ids);
+            _fileIds = new Queue<Int64>(ids);
         }
 
         private void UpdateLastBatchId()
@@ -219,7 +219,7 @@ namespace AppmetrS2S.Persister
             File.WriteAllText(_batchIdFile, Convert.ToString(_lastBatchId));
         }
 
-        private String GetBatchFileName(int batchId)
+        private String GetBatchFileName(Int64 batchId)
         {
             return String.Format("{0}{1:D11}", BatchFilePrefix, batchId);
         }
