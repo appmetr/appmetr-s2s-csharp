@@ -11,7 +11,7 @@
     public class MemoryBatchPersister : IBatchPersister
     {
         private readonly Queue<Batch> _batchQueue = new Queue<Batch>();
-        private int _batchId = 0;
+        private Int64 _batchId = 0;
         private String _serverId;
 
         public Batch GetNext()
