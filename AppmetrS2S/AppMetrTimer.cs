@@ -10,16 +10,16 @@
 
     public class AppMetrTimer
     {
-        private static readonly ILog Log = LogManager.GetLogger(typeof (AppMetrTimer));
+        private static readonly ILog _log = LogUtils.GetLogger(typeof (AppMetrTimer));
 
         private readonly int _period;
         private readonly Action _onTimer;
-        private readonly String _jobName;
+        private readonly string _jobName;
 
         private readonly object _lock = new object();
         private bool _run;
 
-        public AppMetrTimer(int period, Action onTimer, String jobName = "AppMetrTimer")
+        public AppMetrTimer(int period, Action onTimer, string jobName = "AppMetrTimer")
         {
             _period = period;
             _onTimer = onTimer;
@@ -28,34 +28,32 @@
 
         public void Start()
         {
-            if (Log.IsInfoEnabled)
+            if (_log.IsInfoEnabled)
             {
-                Log.InfoFormat("Start {0} with period {1}", _jobName, _period);
+                _log.InfoFormat("Start {0} with period {1}", _jobName, _period);
             }
 
             _run = true;
             while (_run)
             {
-                bool isTaken = false;
-                Monitor.Enter(_lock, ref isTaken);
-                try
+                lock (_lock)
                 {
-                    Monitor.Wait(_lock, _period);
-                    
-                    if (Log.IsInfoEnabled)
+                    try
                     {
-                        Log.InfoFormat("{0} triggered", _jobName);
+                        Monitor.Wait(_lock, _period);
+
+                        _log.InfoFormat("{0} triggered", _jobName);
+                        _onTimer.Invoke();
                     }
-                    _onTimer.Invoke();
-                }
-                catch (ThreadInterruptedException e)
-                {
-                    Log.WarnFormat("{0} interrupted", _jobName);
-                    _run = false;
-                }
-                finally
-                {
-                    if (isTaken) Monitor.Exit(_lock);
+                    catch (ThreadInterruptedException)
+                    {
+                        _log.WarnFormat("{0} interrupted", _jobName);
+                        _run = false;
+                    }
+                    catch (Exception e)
+                    {
+                        _log.ErrorFormat("{0} unhandled exception:\r\n{1}", _jobName, e);
+                    }
                 }
             }
         }
@@ -77,11 +75,7 @@
 
         public void Stop()
         {
-            if (Log.IsInfoEnabled)
-            {
-                Log.InfoFormat("{0} stop triggered", _jobName);
-            }
-
+            _log.InfoFormat("{0} stop triggered", _jobName);
             _run = false;
             Thread.CurrentThread.Interrupt();
         }

@@ -2,6 +2,7 @@
 
 */obj/*
 */bin/*
+.vs/*
 
 *.suo
 
@@ -11,3 +12,7 @@
 deploy.sh
 
 packages
+
+## Mono Develop
+PpmetrS2S.userprefs
+/.idea
