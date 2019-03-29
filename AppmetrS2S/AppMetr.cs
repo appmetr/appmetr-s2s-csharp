@@ -31,7 +31,7 @@ namespace AppmetrS2S
         private readonly AppMetrTimer _uploadTimer;
 
         private int _eventSize;
-        private const int MaxEventsSize = 1024*500*20;//2 MB
+        private const int MaxEventsSize = 2 * 1024 * 1024; //2 MB
 
         private const int MillisPerMinute = 1000*60;
         private const int FlushPeriod = MillisPerMinute/2;
