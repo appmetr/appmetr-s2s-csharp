@@ -31,8 +31,9 @@ namespace AppmetrS2S
         private readonly AppMetrTimer _uploadTimer;
 
         private int _eventSize;
-        private const int MaxEventsSize = 2 * 1024 * 1024; //2 MB
+        private DateTime _lastFlushTime;
 
+        private const int MaxEventsSize = 2 * 1024 * 1024; //2 MB
         private const int MillisPerMinute = 1000*60;
         private const int FlushPeriod = MillisPerMinute/2;
         private const int UploadPeriod = MillisPerMinute/2;
@@ -54,6 +55,8 @@ namespace AppmetrS2S
 
             _uploadTimer = new AppMetrTimer(UploadPeriod, Upload, "UploadJob");
             new Thread(_uploadTimer.Start).Start();
+
+            _lastFlushTime = DateTime.UtcNow;
         }
 
         public void Track(AppMetrAction action)
@@ -72,7 +75,7 @@ namespace AppmetrS2S
                     _eventSize += currentEventSize;
                     _actionList.Add(action);
 
-                    if (FlushNeeded(action))
+                    if (FlushNeeded())
                     {
                         Flush();
                     }
@@ -84,9 +87,23 @@ namespace AppmetrS2S
             }
         }
 
-        protected Boolean FlushNeeded(AppMetrAction action)
+        public Boolean FlushIfNeeded()
         {
-            return _eventSize >= MaxEventsSize;
+            lock (_actionList)
+            {
+                if (FlushNeeded())
+                {
+                    Flush();
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        protected Boolean FlushNeeded()
+        {
+             return _eventSize >= MaxEventsSize || (DateTime.UtcNow - _lastFlushTime).TotalMilliseconds > FlushPeriod;
         }
 
 
@@ -127,6 +144,8 @@ namespace AppmetrS2S
                 {
                     _log.Info("Nothing to flush");
                 }
+
+                _lastFlushTime = DateTime.UtcNow;
             }
         }
 
