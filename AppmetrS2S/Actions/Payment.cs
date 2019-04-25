@@ -42,7 +42,7 @@
         [DataMember(Name = "psUserStoreCountryCode")]
         public String _psUserStoreCountryCode;
 
-        [DataMember(Name = "isSandbox")]
+        [DataMember(Name = "$sandbox")]
         public bool? _isSandbox;
 
         protected Payment() : base(ACTION)

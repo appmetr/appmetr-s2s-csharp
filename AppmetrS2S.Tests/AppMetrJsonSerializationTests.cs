@@ -63,6 +63,22 @@ namespace AppmetrS2S.Tests
             _output.WriteLine("Newtonsoft: " + cacheTime.Elapsed);
         }
 
+        [Fact]
+        public void SerializePayment()
+        {
+            var events = new List<AppMetrAction>
+            {
+                new Payment("order1", "trans1", "proc1", "USD", "123", isSandbox: true)
+            };
+            var batch = new Batch(Guid.NewGuid().ToString(), 1, events);
+
+            var defaultSerializer = new JavaScriptJsonSerializer();
+ 
+            var json = defaultSerializer.Serialize(batch);
+
+            _output.WriteLine("Json: " + json);
+        }
+
         private static Batch CreateBatch(int size)
         {
             var events = new List<Event>();
