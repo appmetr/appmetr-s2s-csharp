@@ -17,7 +17,6 @@
         [DataMember(Name = "timestamp")]
         private long _timestamp = Utils.GetNowUnixTimestamp();
 
-        //https://docs.google.com/document/d/1rDBdmS80-csEd8Lj_r6cGtPV40yqV4zanSK4gkGlJ8U/edit?pli=1
         [DataMember(Name = "$userTime")]
         private long? _userTime;
 
