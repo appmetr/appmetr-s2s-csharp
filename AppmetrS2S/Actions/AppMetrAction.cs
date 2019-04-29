@@ -17,7 +17,7 @@
         [DataMember(Name = "timestamp")]
         private long _timestamp = Utils.GetNowUnixTimestamp();
 
-        [DataMember(Name = "$userTime")]
+        [DataMember(Name = "userTime")]
         private long? _userTime;
 
         [DataMember(Name = "properties")]
