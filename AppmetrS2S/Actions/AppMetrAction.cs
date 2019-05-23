@@ -17,6 +17,9 @@
         [DataMember(Name = "timestamp")]
         private long _timestamp = Utils.GetNowUnixTimestamp();
 
+        [DataMember(Name = "userTime")]
+        private long? _userTime;
+
         [DataMember(Name = "properties")]
         private IDictionary<String, Object> _properties = new Dictionary<string, object>();
 
@@ -34,12 +37,12 @@
 
         public long GetTimestamp()
         {
-            return _timestamp;
+            return _userTime ?? _timestamp; ;
         }
 
         public AppMetrAction SetTimestamp(long timestamp)
         {
-            _timestamp = timestamp;
+            _userTime = timestamp;
             return this;
         }
 
