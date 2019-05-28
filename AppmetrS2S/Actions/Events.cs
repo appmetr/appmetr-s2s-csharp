@@ -1,14 +1,17 @@
-﻿using System;
-
-namespace AppmetrS2S.Actions
+﻿namespace AppmetrS2S.Actions
 {
+    #region using directives
+
+    using System;
+
+    #endregion
     public static class Events
     {
-        public static Event ServerInstall()
+        public static Event ServerInstall(String userId)
         {
-            AppMetrAction event = new Event("server/server_install");
-            
-            return event;
+            Event _event = new Event("server/server_install");
+            _event.SetUserId(userId);
+            return _event;
         }
     }
 }
