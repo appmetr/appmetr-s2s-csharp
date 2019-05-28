@@ -60,12 +60,6 @@ namespace AppmetrS2S
             new Thread(_uploadTimer.Start).Start();
         }
 
-        public void TrackServerInstall(String userId) {
-            AppMetrAction serverInstall = new Event("server/server_install");
-            serverInstall.SetUserId(userId);
-            Track(serverInstall);
-        }
-
         public void Track(AppMetrAction action)
         {
             if (_stopped)
