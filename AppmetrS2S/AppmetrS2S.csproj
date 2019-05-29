@@ -59,7 +59,7 @@
     <Compile Include="Actions\TrackSession.cs" />
     <Compile Include="AppMetr.cs" />
     <Compile Include="AppMetrTimer.cs" />
-    <Compile Include="Events.cs" />
+    <Compile Include="Actions\Events.cs" />
     <Compile Include="HttpRequestService.cs" />
     <Compile Include="LogUtils.cs" />
     <Compile Include="Serializations\IJsonSerializer.cs" />
