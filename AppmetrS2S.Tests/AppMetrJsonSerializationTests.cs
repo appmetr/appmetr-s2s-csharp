@@ -33,6 +33,29 @@ namespace AppmetrS2S.Tests
         }
 
         [Fact]
+        public void SerializeServerInstall()
+        {
+            var defaultSerializer = new JavaScriptJsonSerializer();
+            var install = Events.ServerInstall("test").SetProperties(new Dictionary<string, object>
+            {
+                {"key", "value"} 
+            });
+            var events = new List<AppMetrAction> {install};
+            
+            var batch = new Batch(Guid.NewGuid().ToString(), 1, events);
+
+
+            var json = defaultSerializer.Serialize(batch);
+            var receiveBatch = defaultSerializer.Deserialize<Batch>(json);
+            
+            Assert.Equal(1, receiveBatch.GetBatch().Count);
+            var receivedAction = receiveBatch.GetBatch()[0];
+            Assert.Equal("test", receivedAction.GetUserId());
+            Assert.Equal(1, receivedAction.GetProperties().Count);
+            Assert.Equal("value", receivedAction.GetProperties()["key"]);
+        }
+
+        [Fact]
         public void SerializersBench()
         {
             var batch = CreateBatch(10000);
@@ -112,7 +135,7 @@ namespace AppmetrS2S.Tests
                     {"int", 1000},
                     {"float", 9.99f},
                     {"double", 8.88d},
-                    {"long", long.MaxValue},
+                    {"long", long.MaxValue}
                 });
                 events.Add(e);
             }
