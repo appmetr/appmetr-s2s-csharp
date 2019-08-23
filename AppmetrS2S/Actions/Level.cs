@@ -10,7 +10,7 @@
     [DataContract]
     public class Level : AppMetrAction
     {
-        private const String ACTION = "trackLevel";
+        public const String ACTION = "trackLevel";
 
         [DataMember(Name = "level")]
         private int _level;

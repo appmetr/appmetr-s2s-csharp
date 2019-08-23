@@ -10,7 +10,7 @@
     [DataContract]
     public class Event : AppMetrAction
     {
-        private const String ACTION = "trackEvent";
+        public const String ACTION = "trackEvent";
 
         [DataMember(Name = "event")]
         private String _event;

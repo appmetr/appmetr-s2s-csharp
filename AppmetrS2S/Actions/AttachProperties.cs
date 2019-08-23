@@ -10,7 +10,7 @@
     [DataContract]
     public class AttachProperties : AppMetrAction
     {
-        private const String ACTION = "attachProperties";
+        public const String ACTION = "attachProperties";
 
         public AttachProperties() : base(ACTION)
         {
