@@ -10,7 +10,7 @@
     [DataContract]
     public class Payment : AppMetrAction
     {
-        private const String ACTION = "trackPayment";
+        public const String ACTION = "trackPayment";
 
         [DataMember(Name = "orderId")]
         private String _orderId;

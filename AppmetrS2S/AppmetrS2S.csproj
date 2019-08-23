@@ -53,6 +53,7 @@
     <Compile Include="Actions\AppMetrAction.cs" />
     <Compile Include="Actions\AddToPropertiesValue.cs" />
     <Compile Include="Actions\AttachProperties.cs" />
+    <Compile Include="Actions\AttachEntityAttributes.cs" />
     <Compile Include="Actions\Event.cs" />
     <Compile Include="Actions\Level.cs" />
     <Compile Include="Actions\Payment.cs" />

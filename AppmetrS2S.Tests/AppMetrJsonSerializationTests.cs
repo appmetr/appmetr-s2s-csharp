@@ -41,10 +41,7 @@ namespace AppmetrS2S.Tests
                 {"key", "value"} 
             });
             var events = new List<AppMetrAction> {install};
-            
             var batch = new Batch(Guid.NewGuid().ToString(), 1, events);
-
-
             var json = defaultSerializer.Serialize(batch);
             var receiveBatch = defaultSerializer.Deserialize<Batch>(json);
             
@@ -109,10 +106,7 @@ namespace AppmetrS2S.Tests
             e.SetTimestamp(1);
             Assert.Equal(1, e.GetTimestamp());
 
-            var events = new List<AppMetrAction>
-            {
-                e
-            };
+            var events = new List<AppMetrAction> { e };
             var batch = new Batch(Guid.NewGuid().ToString(), 1, events);
 
             var defaultSerializer = new JavaScriptJsonSerializer();
@@ -120,6 +114,37 @@ namespace AppmetrS2S.Tests
             var json = defaultSerializer.Serialize(batch);
 
             _output.WriteLine("Json: " + json);
+        }
+
+        [Fact]
+        public void SerializeUserTime_not_specified()
+        {
+            var events = new List<AppMetrAction> { new Event("test") };
+            var batch = new Batch(Guid.NewGuid().ToString(), 1, events);
+
+            var defaultSerializer = new JavaScriptJsonSerializer();
+
+            var json = defaultSerializer.Serialize(batch);
+
+            _output.WriteLine("Json: " + json);
+        }
+
+        [Fact]
+        public void SerializeAttachEntityAttributes()
+        {
+            var defaultSerializer = new JavaScriptJsonSerializer();
+            var attach = new AttachEntityAttributes("$serverUserId", "testId");
+            var events = new List<AppMetrAction> { attach };
+            var batch = new Batch(Guid.NewGuid().ToString(), 1, events);
+            var json = defaultSerializer.Serialize(batch);
+            var receiveBatch = defaultSerializer.Deserialize<Batch>(json);
+
+            _output.WriteLine("Json: " + json);
+
+            Assert.Equal(1, receiveBatch.GetBatch().Count);
+            var receivedAction = (AttachEntityAttributes) receiveBatch.GetBatch()[0];
+            Assert.Equal("$serverUserId", receivedAction.GetEntityName());
+            Assert.Equal("testId", receivedAction.GetEntityValue());
         }
 
         private static Batch CreateBatch(int size)
