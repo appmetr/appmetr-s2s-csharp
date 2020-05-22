@@ -55,7 +55,6 @@
     <Compile Include="Actions\AttachProperties.cs" />
     <Compile Include="Actions\AttachEntityAttributes.cs" />
     <Compile Include="Actions\Event.cs" />
-    <Compile Include="Actions\Level.cs" />
     <Compile Include="Actions\Payment.cs" />
     <Compile Include="Actions\TrackSession.cs" />
     <Compile Include="AppMetr.cs" />
