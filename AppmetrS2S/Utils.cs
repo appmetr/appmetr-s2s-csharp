@@ -3,13 +3,13 @@ using System.IO;
 using System.Text;
 using AppmetrS2S.Persister;
 using AppmetrS2S.Serializations;
-using log4net;
+using Common.Logging;
 
 namespace AppmetrS2S
 {
     internal class Utils
     {
-        private static readonly ILog Log = LogUtils.GetLogger(typeof(FileBatchPersister));
+        private static readonly ILog Log = LogManager.GetLogger<FileBatchPersister>();
 
         public static long GetNowUnixTimestamp()
         {

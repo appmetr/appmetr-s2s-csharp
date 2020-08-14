@@ -1,16 +1,17 @@
-﻿namespace AppmetrS2S
+﻿using Common.Logging;
+
+namespace AppmetrS2S
 {
     #region using directives
 
     using System;
     using System.Threading;
-    using log4net;
 
     #endregion
 
     public class AppMetrTimer
     {
-        private static readonly ILog _log = LogUtils.GetLogger(typeof (AppMetrTimer));
+        private static readonly ILog _log = LogManager.GetLogger<AppMetrTimer>();
 
         private readonly int _period;
         private readonly Action _onTimer;
