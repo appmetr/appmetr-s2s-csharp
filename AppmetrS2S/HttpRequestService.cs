@@ -1,23 +1,18 @@
 ﻿using System.IO;
 using AppmetrS2S.Serializations;
 using Common.Logging;
+using System;
+using System.Collections.Generic;
+using System.IO.Compression;
+using System.Net;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Json;
+using System.Text;
+
 
 namespace AppmetrS2S
 {
-    #region using directives
-
-    using System;
-    using System.Collections.Generic;
-    using System.IO.Compression;
-    using System.Net;
-    using System.Runtime.Serialization;
-    using System.Runtime.Serialization.Json;
-    using System.Text;
-    using System.Web;
-    using Persister;
-
-    #endregion
-
+	using Persister;
     internal class HttpRequestService
     {
         private static readonly ILog Log = LogManager.GetLogger<HttpRequestService>();
@@ -116,7 +111,7 @@ namespace AppmetrS2S
                         queryBuilder.Append("&");
                     }
 
-                    queryBuilder.Append(param.Key).Append("=").Append(HttpUtility.UrlEncode(param.Value, Encoding.UTF8));
+                    queryBuilder.Append(param.Key).Append("=").Append(Utils.UrlEncode(param.Value, Encoding.UTF8));
                 }
             }
             return queryBuilder.ToString();
