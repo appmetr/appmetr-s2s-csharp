@@ -1,30 +1,30 @@
-﻿namespace AppmetrS2S.Actions
+﻿using Newtonsoft.Json;
+
+namespace AppmetrS2S.Actions
 {
     #region using directives
 
     using System;
     using System.Collections.Generic;
-    using System.Runtime.Serialization;
 
     #endregion
 
-    [DataContract]
     public abstract class AppMetrAction
     {
-        [DataMember(Name = "action")]
-        private String _action;
+        [JsonProperty("action")]
+        private string _action;
 
-        [DataMember(Name = "timestamp")]
+        [JsonProperty("timestamp")]
         private long _timestamp = Utils.GetNowUnixTimestamp();
 
-        [DataMember(Name = "userTime")]
+        [JsonProperty("userTime")]
         private long? _userTime;
 
-        [DataMember(Name = "properties")]
-        private IDictionary<String, Object> _properties = new Dictionary<string, object>();
+        [JsonProperty("properties")]
+        private IDictionary<string, object> _properties = new Dictionary<string, object>();
 
-        [DataMember(Name = "userId")]
-        private String _userId;
+        [JsonProperty("userId")]
+        private string _userId;
 
         protected AppMetrAction()
         {
@@ -46,23 +46,23 @@
             return this;
         }
 
-        public IDictionary<String, Object> GetProperties()
+        public IDictionary<string, object> GetProperties()
         {
             return _properties;
         }
 
-        public AppMetrAction SetProperties(IDictionary<String, Object> properties)
+        public AppMetrAction SetProperties(IDictionary<string, object> properties)
         {
             _properties = properties;
             return this;
         }
 
-        public String GetUserId()
+        public string GetUserId()
         {
             return _userId;
         }
 
-        public AppMetrAction SetUserId(String userId)
+        public AppMetrAction SetUserId(string userId)
         {
             _userId = userId;
             return this;
@@ -71,13 +71,13 @@
         //http://codeblog.jonskeet.uk/2011/04/05/of-memory-and-strings/
         public virtual int CalcApproximateSize()
         {
-            int size = 40 + (40 * _properties.Count); //40 - Map size and 40 - each entry overhead
+            var size = 40 + (40 * _properties.Count); //40 - Map size and 40 - each entry overhead
 
             size += GetStringLength(_action);
             size += GetStringLength(Convert.ToString(_timestamp));
             size += GetStringLength(_userId);
 
-            foreach (KeyValuePair<String, Object> pair in _properties) {
+            foreach (var pair in _properties) {
                 size += GetStringLength(pair.Key);
                 size += GetStringLength(pair.Value != null ? Convert.ToString(pair.Value) : null);   //toString because sending this object via json
             }
@@ -85,9 +85,9 @@
             return 8 + size + 8; //8 - object header
         }
 
-        protected int GetStringLength(String str)
+        protected int GetStringLength(string str)
         {
-            return str == null ? 0 : str.Length * 2 + 26;    //24 - String object size, 16 - char[]
+            return str?.Length * 2 + 26 ?? 0;    //24 - String object size, 16 - char[]
         }
     }
 }

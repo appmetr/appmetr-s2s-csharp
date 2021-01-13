@@ -31,7 +31,7 @@ namespace AppmetrS2S.Persister
         private Int64 _lastBatchId;
         private String _serverId;
 
-        public FileBatchPersister(string filePath) : this(filePath, new JavaScriptJsonSerializer())
+        public FileBatchPersister(string filePath) : this(filePath, new BasicJsonSerializer())
         {
         }
 

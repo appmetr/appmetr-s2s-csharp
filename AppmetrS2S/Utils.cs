@@ -32,13 +32,13 @@ namespace AppmetrS2S
 
         public static void WriteBatch(Stream stream, Batch batch, IJsonSerializer serializer)
         {
-            Log.DebugFormat("Starting serialize batch with id={0}", batch.GetBatchId());
+            Log.TraceFormat("Starting serialize batch with id={0}", batch.GetBatchId());
             var json = serializer.Serialize(batch);
-            Log.DebugFormat("Get bytes from serialized batch with id={0}", batch.GetBatchId());
-            byte[] data = Encoding.UTF8.GetBytes(json);
-            Log.DebugFormat("Write bytes to stream. Batch id={0}", batch.GetBatchId());
+            Log.TraceFormat("Get bytes from serialized batch with id={0}", batch.GetBatchId());
+            var data = Encoding.UTF8.GetBytes(json);
+            Log.TraceFormat("Write bytes to stream. Batch id={0}", batch.GetBatchId());
             stream.Write(data, 0, data.Length);
-            Log.DebugFormat("Flush stream. Batch id={0}", batch.GetBatchId());
+            Log.TraceFormat("Flush stream. Batch id={0}", batch.GetBatchId());
             stream.Flush();
         }
 
@@ -47,7 +47,7 @@ namespace AppmetrS2S
             try
             {
                 batch = serializer.Deserialize<Batch>(new StreamReader(stream).ReadToEnd());
-                Log.InfoFormat("Successfully read the batch {0}", batch.GetBatchId());
+                Log.TraceFormat("Successfully read the batch {0}", batch.GetBatchId());
                 return true;
             }
             catch (Exception e)

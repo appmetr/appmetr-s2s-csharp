@@ -1,19 +1,14 @@
-﻿namespace AppmetrS2S.Actions
+﻿using Newtonsoft.Json;
+
+namespace AppmetrS2S.Actions
 {
-    #region using directives
-
-    using System;
-    using System.Runtime.Serialization;
-
-    #endregion
-    
-    [DataContract]
+  
     public class Event : AppMetrAction
     {
-        public const String ACTION = "trackEvent";
+        public const string ACTION = "trackEvent";
 
-        [DataMember(Name = "event")]
-        private String _event;
+        [JsonProperty("event")]
+        private string _event;
 
         protected Event()
         {
@@ -24,7 +19,7 @@
             _event = eventName;
         }
 
-        public String GetEvent()
+        public string GetEvent()
         {
             return _event;
         }

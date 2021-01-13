@@ -49,7 +49,7 @@ namespace AppmetrS2S
             _token = token;
             _url = url;
             _batchPersister = batchPersister ?? new MemoryBatchPersister();
-            _httpRequestService = new HttpRequestService(serializer ?? new JavaScriptJsonSerializer());
+            _httpRequestService = new HttpRequestService(serializer ?? new BasicJsonSerializer());
 
             _batchPersister.SetServerId(Guid.NewGuid().ToString());
 

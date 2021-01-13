@@ -23,7 +23,7 @@ namespace AppmetrS2S
         private const string ServerMethodName = "server.trackS2S";
         private readonly IJsonSerializer _serializer;
 
-        public HttpRequestService() : this(new JavaScriptJsonSerializer())
+        public HttpRequestService() : this(new BasicJsonSerializer())
         {
         }
 

@@ -1,4 +1,6 @@
-﻿namespace AppmetrS2S.Actions
+﻿using Newtonsoft.Json;
+
+namespace AppmetrS2S.Actions
 {
     #region using directives
 
@@ -7,33 +9,32 @@
 
     #endregion
     
-    [DataContract]
     public class AttachEntityAttributes : AppMetrAction
     {
-        public const String ACTION = "attachEntityAttributes";
+        public const string ACTION = "attachEntityAttributes";
 
-        [DataMember(Name = "entityName")]
-        private String _entityName;
+        [JsonProperty("entityName")]
+        private string _entityName;
 
-        [DataMember(Name = "entityValue")]
-        private String _entityValue;
+        [JsonProperty("entityValue")]
+        private string _entityValue;
 
         protected AttachEntityAttributes()
         {
         }
 
-        public AttachEntityAttributes(String entityName, String entityValue) : base(ACTION)
+        public AttachEntityAttributes(string entityName, string entityValue) : base(ACTION)
         {
             _entityName = entityName;
             _entityValue = entityValue;
         }
 
-        public String GetEntityName()
+        public string GetEntityName()
         {
             return _entityName;
         }
 
-        public String GetEntityValue()
+        public string GetEntityValue()
         {
             return _entityValue;
         }
