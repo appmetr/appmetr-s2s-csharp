@@ -1,48 +1,42 @@
-﻿namespace AppmetrS2S.Actions
+﻿using Newtonsoft.Json;
+
+namespace AppmetrS2S.Actions
 {
-    #region using directives
-
-    using System;
-    using System.Runtime.Serialization;
-
-    #endregion
-
-    [DataContract]
     public class Payment : AppMetrAction
     {
-        public const String ACTION = "trackPayment";
+        public const string ACTION = "trackPayment";
 
-        [DataMember(Name = "orderId")]
-        private String _orderId;
+        [JsonProperty("orderId")]
+        private string _orderId;
 
-        [DataMember(Name = "transactionId")]
-        private String _transactionId;
+        [JsonProperty("transactionId")]
+        private string _transactionId;
 
-        [DataMember(Name = "processor")]
-        private String _processor;
+        [JsonProperty("processor")]
+        private string _processor;
 
-        [DataMember(Name = "psUserSpentCurrencyCode")]
-        private String _psUserSpentCurrencyCode;
+        [JsonProperty("psUserSpentCurrencyCode")]
+        private string _psUserSpentCurrencyCode;
 
-        [DataMember(Name = "psUserSpentCurrencyAmount")]
-        private String _psUserSpentCurrencyAmount;
+        [JsonProperty("psUserSpentCurrencyAmount")]
+        private string _psUserSpentCurrencyAmount;
 
-        [DataMember(Name = "psReceivedCurrencyCode")]
-        public String _psReceivedCurrencyCode;
+        [JsonProperty("psReceivedCurrencyCode")]
+        public string _psReceivedCurrencyCode;
 
-        [DataMember(Name = "psReceivedCurrencyAmount")]
-        public String _psReceivedCurrencyAmount;
+        [JsonProperty("psReceivedCurrencyAmount")]
+        public string _psReceivedCurrencyAmount;
 
-        [DataMember(Name = "appCurrencyCode")]
-        private String _appCurrencyCode;
+        [JsonProperty("appCurrencyCode")]
+        private string _appCurrencyCode;
 
-        [DataMember(Name = "appCurrencyAmount")]
-        private String _appCurrencyAmount;
+        [JsonProperty("appCurrencyAmount")]
+        private string _appCurrencyAmount;
 
-        [DataMember(Name = "psUserStoreCountryCode")]
-        public String _psUserStoreCountryCode;
+        [JsonProperty("psUserStoreCountryCode")]
+        public string _psUserStoreCountryCode;
 
-        [DataMember(Name = "isSandbox")]
+        [JsonProperty("isSandbox")]
         public bool? _isSandbox;
 
         protected Payment() : base(ACTION)
@@ -50,16 +44,16 @@
         }
 
         public Payment(
-            String orderId,
-            String transactionId,
-            String processor,
-            String psUserSpentCurrencyCode,
-            String psUserSpentCurrencyAmount,
-            String psReceivedCurrencyCode = null,
-            String psReceivedCurrencyAmount = null,
-            String appCurrencyCode = null,
-            String appCurrencyAmount = null,
-            String psUserStoreCountryCode = null,
+	        string orderId,
+            string transactionId,
+            string processor,
+            string psUserSpentCurrencyCode,
+            string psUserSpentCurrencyAmount,
+            string psReceivedCurrencyCode = null,
+            string psReceivedCurrencyAmount = null,
+            string appCurrencyCode = null,
+            string appCurrencyAmount = null,
+            string psUserStoreCountryCode = null,
             bool? isSandbox = null
             ) : this()
         {
@@ -76,52 +70,52 @@
             _isSandbox = isSandbox;
         }
 
-        public String GetOrderId()
+        public string GetOrderId()
         {
             return _orderId;
         }
 
-        public String GetTransactionId()
+        public string GetTransactionId()
         {
             return _transactionId;
         }
 
-        public String GetProcessor()
+        public string GetProcessor()
         {
             return _processor;
         }
 
-        public String GetPsUserSpentCurrencyCode()
+        public string GetPsUserSpentCurrencyCode()
         {
             return _psUserSpentCurrencyCode;
         }
 
-        public String GetPsUserSpentCurrencyAmount()
+        public string GetPsUserSpentCurrencyAmount()
         {
             return _psUserSpentCurrencyAmount;
         }
 
-        public String GetPsReceivedCurrencyCode()
+        public string GetPsReceivedCurrencyCode()
         {
             return _psReceivedCurrencyCode;
         }
 
-        public String GetPsReceivedCurrencyAmount()
+        public string GetPsReceivedCurrencyAmount()
         {
             return _psReceivedCurrencyAmount;
         }
 
-        public String GetAppCurrencyCode()
+        public string GetAppCurrencyCode()
         {
             return _appCurrencyCode;
         }
 
-        public String GetAppCurrencyAmount()
+        public string GetAppCurrencyAmount()
         {
             return _appCurrencyAmount;
         }
 
-        public String GetPsUserStoreCountryCode()
+        public string GetPsUserStoreCountryCode()
         {
             return _psUserStoreCountryCode;
         }

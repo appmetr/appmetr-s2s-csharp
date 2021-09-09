@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using AppmetrS2S.Actions;
 using AppmetrS2S.Persister;
 using AppmetrS2S.Serializations;
@@ -17,25 +16,11 @@ namespace AppmetrS2S.Tests
         {
             _output = output;
         }
-
-        [Fact]
-        public void SerializersShouldReturnsEqualsValues()
-        {
-            var batch = CreateBatch(50000);
-
-            var defaultSerializer = new JavaScriptJsonSerializer();
-            var cacheSerializer = new JavaScriptJsonSerializerWithCache();
-
-            var defaultJson = defaultSerializer.Serialize(batch);
-            var newtonsoftJson = cacheSerializer.Serialize(batch);
-
-            Assert.Equal(defaultJson, newtonsoftJson);
-        }
-
+        
         [Fact]
         public void SerializeServerInstall()
         {
-            var defaultSerializer = new JavaScriptJsonSerializer();
+            var defaultSerializer = new BasicJsonSerializer();
             var install = Events.ServerInstall("test").SetProperties(new Dictionary<string, object>
             {
                 {"key", "value"} 
@@ -52,36 +37,6 @@ namespace AppmetrS2S.Tests
             Assert.Equal("value", receivedAction.GetProperties()["key"]);
         }
 
-        [Fact]
-        public void SerializersBench()
-        {
-            var batch = CreateBatch(10000);
-
-            var defaultSerializer = new JavaScriptJsonSerializer();
-            var cacheSerializer = new JavaScriptJsonSerializerWithCache();
-
-            defaultSerializer.Serialize(batch);
-            cacheSerializer.Serialize(batch);
-
-            const int iterationsCount = 100;
-
-            var cacheTime = Stopwatch.StartNew();
-            for (var i = 0; i < iterationsCount; i++)
-            {
-                cacheSerializer.Serialize(batch);
-            }
-            cacheTime.Stop();
-
-            var defaultTime = Stopwatch.StartNew();
-            for (var i = 0; i < iterationsCount; i++)
-            {
-                defaultSerializer.Serialize(batch);
-            }
-            defaultTime.Stop();
-
-            _output.WriteLine("Default: " + defaultTime.Elapsed);
-            _output.WriteLine("Newtonsoft: " + cacheTime.Elapsed);
-        }
 
         [Fact]
         public void SerializePayment()
@@ -92,7 +47,7 @@ namespace AppmetrS2S.Tests
             };
             var batch = new Batch(Guid.NewGuid().ToString(), 1, events);
 
-            var defaultSerializer = new JavaScriptJsonSerializer();
+            var defaultSerializer = new BasicJsonSerializer();
 
             var json = defaultSerializer.Serialize(batch);
 
@@ -109,7 +64,7 @@ namespace AppmetrS2S.Tests
             var events = new List<AppMetrAction> { e };
             var batch = new Batch(Guid.NewGuid().ToString(), 1, events);
 
-            var defaultSerializer = new JavaScriptJsonSerializer();
+            var defaultSerializer = new BasicJsonSerializer();
 
             var json = defaultSerializer.Serialize(batch);
 
@@ -122,7 +77,7 @@ namespace AppmetrS2S.Tests
             var events = new List<AppMetrAction> { new Event("test") };
             var batch = new Batch(Guid.NewGuid().ToString(), 1, events);
 
-            var defaultSerializer = new JavaScriptJsonSerializer();
+            var defaultSerializer = new BasicJsonSerializer();
 
             var json = defaultSerializer.Serialize(batch);
 
@@ -132,7 +87,7 @@ namespace AppmetrS2S.Tests
         [Fact]
         public void SerializeAttachEntityAttributes()
         {
-            var defaultSerializer = new JavaScriptJsonSerializer();
+            var defaultSerializer = new BasicJsonSerializer();
             var attach = new AttachEntityAttributes("$serverUserId", "testId");
             var events = new List<AppMetrAction> { attach };
             var batch = new Batch(Guid.NewGuid().ToString(), 1, events);

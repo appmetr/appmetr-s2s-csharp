@@ -1,4 +1,6 @@
-﻿namespace AppmetrS2S.Persister
+﻿using Newtonsoft.Json;
+
+namespace AppmetrS2S.Persister
 {
     #region using directives
 
@@ -9,35 +11,30 @@
 
     #endregion
 
-    [DataContract]
-    [KnownType(typeof(AttachProperties))]
-    [KnownType(typeof(Event))]
-    [KnownType(typeof(Payment))]
-    [KnownType(typeof(TrackSession))]
     public class Batch
     {
-        [DataMember(Name = "batchId")]
-        private readonly Int64 _batchId;
+        [JsonProperty("batchId")]
+        private readonly long _batchId;
 
-        [DataMember(Name = "batch")]
+        [JsonProperty("batch")]
         private readonly List<AppMetrAction> _batch;
 
-        [DataMember(Name = "serverId")]
-        private readonly String _serverId;
+        [JsonProperty("serverId")]
+        private readonly string _serverId;
 
         private Batch()
         {
             
         }
 
-        public Batch(String serverId, Int64 batchId, IEnumerable<AppMetrAction> actionList)
+        public Batch(string serverId, long batchId, IEnumerable<AppMetrAction> batch)
         {
             _serverId = serverId;
             _batchId = batchId;
-            _batch = new List<AppMetrAction>(actionList);
+            _batch = new List<AppMetrAction>(batch);
         }
 
-        public Int64 GetBatchId()
+        public long GetBatchId()
         {
             return _batchId;
         }
@@ -47,9 +44,9 @@
             return _batch;
         }
 
-        public override String ToString()
+        public override string ToString()
         {
-            return String.Format("Batch{{events={0}, batchId={1}, serverId={2}}", _batch.Count, _batchId, _serverId);
+            return string.Format("Batch{{events={0}, batchId={1}, serverId={2}}", _batch.Count, _batchId, _serverId);
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using AppmetrS2S.Serializations;
+using Common.Logging;
 
 namespace AppmetrS2S
 {
@@ -8,14 +9,13 @@ namespace AppmetrS2S
     using System.Collections.Generic;
     using System.Threading;
     using Actions;
-    using log4net;
     using Persister;
 
     #endregion
 
     public class AppMetr
     {
-        private static readonly ILog _log = LogUtils.GetLogger(typeof (AppMetr));
+        private static readonly ILog _log = LogManager.GetLogger<AppMetr>();
 
         private readonly string _token;
         private readonly string _url;
@@ -49,7 +49,7 @@ namespace AppmetrS2S
             _token = token;
             _url = url;
             _batchPersister = batchPersister ?? new MemoryBatchPersister();
-            _httpRequestService = new HttpRequestService(serializer ?? new JavaScriptJsonSerializer());
+            _httpRequestService = new HttpRequestService(serializer ?? new BasicJsonSerializer());
 
             _batchPersister.SetServerId(Guid.NewGuid().ToString());
 

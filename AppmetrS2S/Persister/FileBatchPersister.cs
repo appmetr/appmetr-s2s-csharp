@@ -1,4 +1,5 @@
 ﻿using AppmetrS2S.Serializations;
+using Common.Logging;
 
 namespace AppmetrS2S.Persister
 {
@@ -11,13 +12,12 @@ namespace AppmetrS2S.Persister
     using System.Linq;
     using System.Threading;
     using Actions;
-    using log4net;
 
     #endregion
 
     public class FileBatchPersister : IBatchPersister
     {
-        private static readonly ILog Log = LogUtils.GetLogger(typeof(FileBatchPersister));
+        private static readonly ILog Log = LogManager.GetLogger<FileBatchPersister>();
 
         private readonly ReaderWriterLock _lock = new ReaderWriterLock();
 
@@ -31,7 +31,7 @@ namespace AppmetrS2S.Persister
         private Int64 _lastBatchId;
         private String _serverId;
 
-        public FileBatchPersister(string filePath) : this(filePath, new JavaScriptJsonSerializer())
+        public FileBatchPersister(string filePath) : this(filePath, new BasicJsonSerializer())
         {
         }
 

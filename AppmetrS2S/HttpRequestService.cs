@@ -1,26 +1,21 @@
 ﻿using System.IO;
 using AppmetrS2S.Serializations;
+using Common.Logging;
+using System;
+using System.Collections.Generic;
+using System.IO.Compression;
+using System.Net;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Json;
+using System.Text;
+
 
 namespace AppmetrS2S
 {
-    #region using directives
-
-    using System;
-    using System.Collections.Generic;
-    using System.IO.Compression;
-    using System.Net;
-    using System.Runtime.Serialization;
-    using System.Runtime.Serialization.Json;
-    using System.Text;
-    using System.Web;
-    using log4net;
-    using Persister;
-
-    #endregion
-
+	using Persister;
     internal class HttpRequestService
     {
-        private static readonly ILog Log = LogUtils.GetLogger(typeof (HttpRequestService));
+        private static readonly ILog Log = LogManager.GetLogger<HttpRequestService>();
 
 		private static readonly int READ_WRITE_TIMEOUT = 10 * 60 * 1000;
 		private static readonly int WHOLE_RQUEST_TIMEOUT = 12 * 60 * 1000;
@@ -28,7 +23,7 @@ namespace AppmetrS2S
         private const string ServerMethodName = "server.trackS2S";
         private readonly IJsonSerializer _serializer;
 
-        public HttpRequestService() : this(new JavaScriptJsonSerializer())
+        public HttpRequestService() : this(new BasicJsonSerializer())
         {
         }
 
@@ -116,7 +111,7 @@ namespace AppmetrS2S
                         queryBuilder.Append("&");
                     }
 
-                    queryBuilder.Append(param.Key).Append("=").Append(HttpUtility.UrlEncode(param.Value, Encoding.UTF8));
+                    queryBuilder.Append(param.Key).Append("=").Append(Utils.UrlEncode(param.Value, Encoding.UTF8));
                 }
             }
             return queryBuilder.ToString();
