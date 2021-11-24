@@ -28,12 +28,12 @@ namespace AppmetrS2S
         private readonly object _flushLock = new object();
         private readonly object _uploadLock = new object();
 
-        private readonly AppMetrTimer _flushTimer;
         private readonly AppMetrTimer _uploadTimer;
 
         private int _eventSize;
-        private const int MaxEventsSize = 1024*500*20;//2 MB
+        private DateTime _lastFlushTime;
 
+        private const int MaxEventsSize = 2 * 1024 * 1024; //2 MB
         private const int MillisPerMinute = 1000*60;
         private const int FlushPeriod = MillisPerMinute/2;
         private const int UploadPeriod = MillisPerMinute/2;
@@ -53,11 +53,10 @@ namespace AppmetrS2S
 
             _batchPersister.SetServerId(Guid.NewGuid().ToString());
 
-            _flushTimer = new AppMetrTimer(FlushPeriod, Flush, "FlushJob");
-            new Thread(_flushTimer.Start).Start();
-
             _uploadTimer = new AppMetrTimer(UploadPeriod, Upload, "UploadJob");
             new Thread(_uploadTimer.Start).Start();
+
+            _lastFlushTime = DateTime.UtcNow;
         }
 
         public void Track(AppMetrAction action)
@@ -71,18 +70,15 @@ namespace AppmetrS2S
             {
                 var currentEventSize = action.CalcApproximateSize();
 
-                bool flushNeeded;
                 lock (_actionList)
                 {
                     _eventSize += currentEventSize;
                     _actionList.Add(action);
 
-                    flushNeeded = _eventSize >= MaxEventsSize;
-                }
-
-                if (flushNeeded)
-                {
-                    _flushTimer.Trigger();
+                    if (FlushNeeded())
+                    {
+                        Flush();
+                    }
                 }
             }
             catch (Exception e)
@@ -90,6 +86,26 @@ namespace AppmetrS2S
                 _log.Error("Track failed", e);
             }
         }
+
+        public Boolean FlushIfNeeded()
+        {
+            lock (_actionList)
+            {
+                if (FlushNeeded())
+                {
+                    Flush();
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        protected Boolean FlushNeeded()
+        {
+             return _eventSize >= MaxEventsSize || (DateTime.UtcNow - _lastFlushTime).TotalMilliseconds > FlushPeriod;
+        }
+
 
         public void Stop()
         {
@@ -100,11 +116,6 @@ namespace AppmetrS2S
             lock (_uploadLock)
             {
                 _uploadTimer.Stop();
-            }
-
-            lock (_flushLock)
-            {
-                _flushTimer.Stop();
             }
 
             Flush();
@@ -133,6 +144,8 @@ namespace AppmetrS2S
                 {
                     _log.Info("Nothing to flush");
                 }
+
+                _lastFlushTime = DateTime.UtcNow;
             }
         }
 
