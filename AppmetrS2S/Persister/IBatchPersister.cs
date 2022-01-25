@@ -7,9 +7,9 @@
     public interface IBatchPersister
     {
         /// <summary>
-        /// Get the oldest batch from storage, but dont remove it.
+        /// Get the oldest batch from storage, but don't remove it.
         /// </summary>
-        Batch GetNext();
+        byte[] GetNext();
 
         /// <summary>
         /// Persist list of events as Batch.

@@ -15,7 +15,7 @@ namespace AppmetrS2S
 
     public class AppMetr
     {
-        private static readonly ILog _log = LogManager.GetLogger<AppMetr>();
+        private static readonly ILog Log = LogManager.GetLogger<AppMetr>();
 
         private readonly string _token;
         private readonly string _url;
@@ -32,7 +32,7 @@ namespace AppmetrS2S
         private readonly AppMetrTimer _uploadTimer;
 
         private int _eventSize;
-        private const int MaxEventsSize = 1024*500*20;//2 MB
+        private const int MaxEventsSize = 1024*500*20;
 
         private const int MillisPerMinute = 1000*60;
         private const int FlushPeriod = MillisPerMinute/2;
@@ -44,12 +44,13 @@ namespace AppmetrS2S
             IBatchPersister batchPersister = null,
             IJsonSerializer serializer = null)
         {
-            _log.InfoFormat("Start Appmetr for token={0}, url={1}", token, url);
+            Log.InfoFormat("Start Appmetr for token={0}, url={1}", token, url);
 
             _token = token;
             _url = url;
-            _batchPersister = batchPersister ?? new MemoryBatchPersister();
-            _httpRequestService = new HttpRequestService(serializer ?? new BasicJsonSerializer());
+            var jsonSerializer = serializer ?? new BasicJsonSerializer();
+            _batchPersister = batchPersister ?? new MemoryBatchPersister(jsonSerializer);
+            _httpRequestService = new HttpRequestService();
 
             _batchPersister.SetServerId(Guid.NewGuid().ToString());
 
@@ -87,13 +88,13 @@ namespace AppmetrS2S
             }
             catch (Exception e)
             {
-                _log.Error("Track failed", e);
+                Log.Error("Track failed", e);
             }
         }
 
         public void Stop()
         {
-            _log.Info("Stop appmetr");
+            Log.Info("Stop appmetr");
 
             _stopped = true;
 
@@ -117,7 +118,7 @@ namespace AppmetrS2S
                 List<AppMetrAction> copyActions;
                 lock (_actionList)
                 {
-                    _log.DebugFormat("Flush started for {0} actions", _actionList.Count);
+                    Log.DebugFormat("Flush started for {0} actions", _actionList.Count);
 
                     copyActions = new List<AppMetrAction>(_actionList);
                     _actionList.Clear();
@@ -131,7 +132,7 @@ namespace AppmetrS2S
                 }
                 else
                 {
-                    _log.Info("Nothing to flush");
+                    Log.Info("Nothing to flush");
                 }
             }
         }
@@ -140,33 +141,33 @@ namespace AppmetrS2S
         {
             lock (_uploadLock)
             {
-                _log.Debug("Upload started");
+                Log.Debug("Upload started");
 
-                Batch batch;
+                byte[] batch;
                 var uploadedBatchCounter = 0;
                 var allBatchCounter = 0;
                 while ((batch = _batchPersister.GetNext()) != null)
                 {
                     allBatchCounter++;
 
-                    _log.DebugFormat("Starting send batch with id={0}", batch.GetBatchId());
+                    Log.DebugFormat("Starting send batch");
                     if (_httpRequestService.SendRequest(_url, _token, batch))
                     {
-                        _log.DebugFormat("Successfuly send batch with id={0}", batch.GetBatchId());
+                        Log.DebugFormat("Successfully sent batch");
 
                         _batchPersister.Remove();
                         uploadedBatchCounter++;
 
-                        _log.DebugFormat("Batch {0} successfully uploaded", batch.GetBatchId());
+                        Log.DebugFormat("Batch successfully uploaded");
                     }
                     else
                     {
-                        _log.ErrorFormat("Error while upload batch {0}", batch.GetBatchId());
+                        Log.ErrorFormat("Error while upload batch");
                         break;
                     }
                 }
 
-                _log.DebugFormat("{0} from {1} batches uploaded", uploadedBatchCounter, allBatchCounter);
+                Log.DebugFormat("{0} from {1} batches uploaded", uploadedBatchCounter, allBatchCounter);
             }
         }
     }
