@@ -1,9 +1,7 @@
-﻿using System.IO;
-using AppmetrS2S.Serializations;
+﻿using AppmetrS2S.Serializations;
 using Common.Logging;
 using System;
 using System.Collections.Generic;
-using System.IO.Compression;
 using System.Net;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Json;
@@ -12,27 +10,16 @@ using System.Text;
 
 namespace AppmetrS2S
 {
-	using Persister;
     internal class HttpRequestService
     {
         private static readonly ILog Log = LogManager.GetLogger<HttpRequestService>();
 
-		private static readonly int READ_WRITE_TIMEOUT = 10 * 60 * 1000;
-		private static readonly int WHOLE_RQUEST_TIMEOUT = 12 * 60 * 1000;
+        private static readonly int READ_WRITE_TIMEOUT = 10 * 60 * 1000;
+        private static readonly int WHOLE_RQUEST_TIMEOUT = 12 * 60 * 1000;
 
         private const string ServerMethodName = "server.trackS2S";
-        private readonly IJsonSerializer _serializer;
 
-        public HttpRequestService() : this(new BasicJsonSerializer())
-        {
-        }
-
-        public HttpRequestService(IJsonSerializer serializer)
-        {
-            _serializer = serializer;
-        }
-
-        public bool SendRequest(string httpUrl, string token, Batch batch)
+        public bool SendRequest(string httpUrl, string token, byte[] batch)
         {
             var @params = new Dictionary<string, string>(3)
             {
@@ -41,38 +28,27 @@ namespace AppmetrS2S
                 {"timestamp", Convert.ToString(Utils.GetNowUnixTimestamp())}
             };
 
-            byte[] deflatedBatch;
-            var serializedBatch = Utils.SerializeBatch(batch, _serializer);
-            using (var memoryStream = new MemoryStream())
-            {
-                using (var deflateStream = new DeflateStream(memoryStream, CompressionLevel.Optimal))
-                {
-                    Utils.WriteData(deflateStream, serializedBatch);
-                }
-                deflatedBatch = memoryStream.ToArray();
-            }
-            
             var request = (HttpWebRequest)WebRequest.Create(httpUrl + "?" + MakeQueryString(@params));
             request.Method = "POST";
             request.ContentType = "application/octet-stream";
-            request.ContentLength = deflatedBatch.Length;
-			request.Timeout = WHOLE_RQUEST_TIMEOUT;
-			request.ReadWriteTimeout = READ_WRITE_TIMEOUT;
+            request.ContentLength = batch.Length;
+            request.Timeout = WHOLE_RQUEST_TIMEOUT;
+            request.ReadWriteTimeout = READ_WRITE_TIMEOUT;
 
-            Log.DebugFormat("Getting request (contentLength = {0}) stream for batch with id={1}", deflatedBatch.Length, batch.GetBatchId());
+            Log.DebugFormat("Getting request (contentLength = {0}) stream for batch.", batch.Length);
             using (var stream = request.GetRequestStream())
             {
-                Log.DebugFormat("Request stream created for batch with id={0}", batch.GetBatchId());
-                Log.DebugFormat("Write bytes to stream. Batch id={0}", batch.GetBatchId());
-                Utils.WriteData(stream, deflatedBatch);
+                Log.DebugFormat("Request stream created for batch.");
+                Log.DebugFormat("Write bytes to stream.");
+                Utils.WriteData(stream, batch);
             }
 
             try
             {
-                Log.DebugFormat("Getting response after sending batch with id={0}", batch.GetBatchId());
+                Log.DebugFormat("Getting response after sending batch");
                 using (var response = (HttpWebResponse) request.GetResponse())
                 {
-                    Log.DebugFormat("Response received for batch with id={0}", batch.GetBatchId());
+                    Log.DebugFormat("Response received for batch");
 
                     var serializer = new DataContractJsonSerializer(typeof (JsonResponseWrapper));
                     var jsonResponse = (JsonResponseWrapper) serializer.ReadObject(response.GetResponseStream());
