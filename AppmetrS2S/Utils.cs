@@ -10,7 +10,7 @@ namespace AppmetrS2S
 {
     internal class Utils
     {
-        private static readonly ILog Log = LogManager.GetLogger<FileBatchPersister>();
+        private static readonly ILog Log = LogManager.GetLogger<Utils>();
 
         public static long GetNowUnixTimestamp()
         {
@@ -42,12 +42,17 @@ namespace AppmetrS2S
             stream.Flush();
         }
 
-        public static bool TryReadBatch(Stream stream, IJsonSerializer serializer, out Batch batch)
+        public static bool TryReadBatch(Stream stream, out byte[] batch)
         {
             try
             {
-                batch = serializer.Deserialize<Batch>(new StreamReader(stream).ReadToEnd());
-                Log.TraceFormat("Successfully read the batch {0}", batch.GetBatchId());
+                using (MemoryStream ms = new MemoryStream())
+                {
+                    stream.CopyTo(ms);
+                    batch = ms.ToArray();
+                }
+
+                Log.TraceFormat("Successfully read the batch");
                 return true;
             }
             catch (Exception e)
@@ -63,19 +68,19 @@ namespace AppmetrS2S
         }
 
         public static string UrlEncode(string str, Encoding e) => 
-	        !string.IsNullOrWhiteSpace(str)
-		        ? Encoding.ASCII.GetString(UrlEncodeToBytes(str, e)) 
-		        : null;
+            !string.IsNullOrWhiteSpace(str)
+                ? Encoding.ASCII.GetString(UrlEncodeToBytes(str, e)) 
+                : null;
 
         private static byte[] UrlEncodeToBytes(string str, Encoding e)
         {
-	        var bytes = e.GetBytes(str);
-	        return UrlEncode(bytes, bytes.Length);
+            var bytes = e.GetBytes(str);
+            return UrlEncode(bytes, bytes.Length);
         }
 
         private static byte[] UrlEncode(byte[] bytes, int count)
         {
-	        var num1 = 0;
+            var num1 = 0;
             var num2 = 0;
             for (var index = 0; index < count; ++index)
             {
@@ -128,30 +133,30 @@ namespace AppmetrS2S
 
         public static bool IsUrlSafeChar(char ch)
         {
-	        if (ch >= 'a' && ch <= 'z' || ch >= 'A' && ch <= 'Z' || (ch >= '0' && ch <= '9' || ch == '!'))
-		        return true;
-	        switch (ch)
-	        {
-		        case '(':
-		        case ')':
-		        case '*':
-		        case '-':
-		        case '.':
-		        case '_':
-			        return true;
-		        default:
-			        return false;
-	        }
+            if (ch >= 'a' && ch <= 'z' || ch >= 'A' && ch <= 'Z' || (ch >= '0' && ch <= '9' || ch == '!'))
+                return true;
+            switch (ch)
+            {
+                case '(':
+                case ')':
+                case '*':
+                case '-':
+                case '.':
+                case '_':
+                    return true;
+                default:
+                    return false;
+            }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static char ToCharLower(int value)
         {
-	        value &= 15;
-	        value += 48;
-	        if (value > 57)
-		        value += 39;
-	        return (char)value;
+            value &= 15;
+            value += 48;
+            if (value > 57)
+                value += 39;
+            return (char)value;
         }
     }
 }

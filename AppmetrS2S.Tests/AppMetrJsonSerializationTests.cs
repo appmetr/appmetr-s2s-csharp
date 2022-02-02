@@ -101,27 +101,5 @@ namespace AppmetrS2S.Tests
             Assert.Equal("$serverUserId", receivedAction.GetEntityName());
             Assert.Equal("testId", receivedAction.GetEntityValue());
         }
-
-        private static Batch CreateBatch(int size)
-        {
-            var events = new List<Event>();
-            for (var i = 0; i < size; i++)
-            {
-                var e = new Event("Event #" + i);
-                e.SetProperties(new Dictionary<string, object>
-                {
-                    {"index", i},
-                    {"string", "string"},
-                    {"int", 1000},
-                    {"float", 9.99f},
-                    {"double", 8.88d},
-                    {"long", long.MaxValue}
-                });
-                events.Add(e);
-            }
-
-            var batch = new Batch(Guid.NewGuid().ToString(), 1, events);
-            return batch;
-        }
     }
 }

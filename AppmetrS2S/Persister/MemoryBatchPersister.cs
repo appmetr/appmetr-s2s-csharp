@@ -1,4 +1,6 @@
-﻿namespace AppmetrS2S.Persister
+﻿using AppmetrS2S.Serializations;
+
+namespace AppmetrS2S.Persister
 {
     #region using directives
 
@@ -11,14 +13,25 @@
     public class MemoryBatchPersister : IBatchPersister
     {
         private readonly Queue<Batch> _batchQueue = new Queue<Batch>();
+        private readonly IJsonSerializer _serializer;
         private Int64 _batchId = 0;
         private String _serverId;
 
-        public Batch GetNext()
+        public MemoryBatchPersister(IJsonSerializer serializer)
+        {
+            _serializer = serializer;
+        }
+
+        public byte[] GetNext()
         {
             lock (_batchQueue)
             {
-                return _batchQueue.Count == 0 ? null : _batchQueue.Peek();
+                if (_batchQueue.Count == 0)
+                    return null;
+
+                var batch = _batchQueue.Peek();
+                var binaryBatch = Utils.SerializeBatch(batch, _serializer);
+                return binaryBatch;
             }
         }
 

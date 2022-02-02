@@ -49,7 +49,7 @@ namespace AppmetrS2S.Persister
             InitPersistedFiles();
         }
 
-        public Batch GetNext()
+        public byte[] GetNext()
         {
             Log.Debug("Try to get reader lock");
             _lock.AcquireReaderLock(-1);
@@ -71,11 +71,10 @@ namespace AppmetrS2S.Persister
                     Log.DebugFormat("File {0} exists!", batchFilePath);
 
                     using (var fileStream = new FileStream(batchFilePath, FileMode.Open))
-                    using (var deflateStream = new DeflateStream(fileStream, CompressionMode.Decompress))
                     {
                         Log.DebugFormat("Deflated file stream created for file {0}", batchFilePath);
-                        Batch batch;
-                        if (Utils.TryReadBatch(deflateStream, _serializer, out batch))
+                        byte[] batch;
+                        if (Utils.TryReadBatch(fileStream, out batch))
                         {
                             Log.DebugFormat("Successfully read the batch from file {0}", batchFilePath);
                             return batch;
