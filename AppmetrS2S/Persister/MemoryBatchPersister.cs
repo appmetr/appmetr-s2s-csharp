@@ -17,6 +17,10 @@ namespace AppmetrS2S.Persister
         private Int64 _batchId = 0;
         private String _serverId;
 
+        public MemoryBatchPersister() : this(new BasicJsonSerializer())
+        {
+        }
+
         public MemoryBatchPersister(IJsonSerializer serializer)
         {
             _serializer = serializer;
